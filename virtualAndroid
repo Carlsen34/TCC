@@ -1,0 +1,2 @@
+cd /Android/Sdk/emulator$ 
+sudo ./emulator -avd Nexus
