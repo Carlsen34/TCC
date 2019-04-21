@@ -5,7 +5,8 @@ import Amplify, { Auth } from 'aws-amplify';
 import AWSConfig from './aws-exports';
 Amplify.configure(AWSConfig);
 
-import Tabs from './Tabs';
+import Tabs from './AuthenticationModules/Tabs';
+//import Tabs from './Tabs';
 
 export default class App extends React.Component {
   state = {
