@@ -5,7 +5,10 @@ import Amplify, { Auth } from 'aws-amplify';
 import AWSConfig from './aws-exports';
 Amplify.configure(AWSConfig);
 
-import Tabs from './AuthenticationModules/Tabs';
+
+
+import Tabs from './Modules/AuthenticationModules/Tabs';
+import ListUsers from './Modules/RelashionshipModules/ListUsers';
 //import Tabs from './Tabs';
 
 export default class App extends React.Component {
@@ -19,11 +22,7 @@ export default class App extends React.Component {
     if (this.state.isAuthenticated) {
       console.log('Auth: ', Auth);
       return (
-        <View
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-        >
-          <Text>Hello {Auth.user.username}!</Text>
-        </View>
+        <ListUsers/>
       );
     }
     return (
