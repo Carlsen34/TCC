@@ -17,3 +17,11 @@ adb server killed by remote request
 adb I 15980 15980 main.cpp:78] Android Debug Bridge version 1.0.36
 adb I 15980 15980 main.cpp:78] Revision af05c7354fe1-android
 adb I 15980 15980 main.cpp:78] 
+--- adb starting (pid 3588) ---
+adb I  3588  3588 main.cpp:78] Android Debug Bridge version 1.0.36
+adb I  3588  3588 main.cpp:78] Revision af05c7354fe1-android
+adb I  3588  3588 main.cpp:78] 
+--- adb starting (pid 3333) ---
+adb I  3333  3333 main.cpp:78] Android Debug Bridge version 1.0.36
+adb I  3333  3333 main.cpp:78] Revision af05c7354fe1-android
+adb I  3333  3333 main.cpp:78] 

@@ -19,22 +19,19 @@ AWS.config.update({
 
 const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 
-
-var params = {
-    GroupName: 'tcc_userpool_MOBILEHUB_2071165218', /* required */
-    UserPoolId: 'us-east-1_pzJ6w0dlE', /* required */
-
-  };
-
-
+ var params = {
+  UserPoolId: "us-east-1_pzJ6w0dlE",
+ }
 
 export default class App extends React.Component {
 
 
 render(){
-    cognitoIdentityServiceProvider.listUsersInGroup(params, function(err, data) {
+    cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
         if (err) console.log("ERROR "+err, err.stack); // an error occurred
-        else     console.log(data);           // successful response
+        else{
+        console.log(Object.values(data.Users));
+        } ;           // successful response
       });
 
     return(
