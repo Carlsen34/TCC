@@ -1,6 +1,6 @@
 import React from 'react';
 import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView } from 'react-native';
-import Amplify,{ Auth } from 'aws-amplify';
+import Amplify,{ Auth,API } from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
 var AWS = require('aws-sdk');
 Amplify.configure(AWSConfig);
@@ -23,8 +23,62 @@ const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
   UserPoolId: "us-east-1_pzJ6w0dlE",
  }
 
+
+
+ // Create a new Note according to the columns we defined earlier
+ async function saveNote() {
+  let newNote = {
+    body: {
+      "NoteTitle": "My first note!",
+      "NoteContent": "This is so cool!",
+      "NoteId": this.state.noteId
+    }
+  }
+  const path = "/Notes";
+
+  // Use the API module to save the note to the database
+  try {
+    const apiResponse = await API.put("NotesCRUD", path, newNote)
+    console.log("response from saving note: " + apiResponse);
+    this.setState({apiResponse});
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+ async function getNote() {
+  const path = "/Notes/object/" + this.state.noteId;
+  try {
+    const apiResponse = await API.get("NotesCRUD", path);
+    console.log("response from getting note: " + apiResponse);
+    this.setState({apiResponse});
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+async function deleteNote() {
+  const path = "/Notes/object/" + this.state.noteId;
+  try {
+    const apiResponse = await API.del("NotesCRUD", path);
+    console.log("response from deleteing note: " + apiResponse);
+    this.setState({apiResponse});
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+
 export default class App extends React.Component {
 
+  state = {
+    apiResponse: null,
+    noteId: ''
+  };
+      
+  handleChangeNoteId = (event) => {
+      this.setState({noteId: event});
+  }
 
 render(){
     cognitoIdentityServiceProvider.listUsers(params, function(err, data) {

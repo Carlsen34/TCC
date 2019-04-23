@@ -1,0 +1,5 @@
+{
+    "tableName": "dynamoRelashionship",
+    "partitionKeyName": "Users",
+    "partitionKeyType": "S"
+}
