@@ -24,9 +24,16 @@ const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
  }
 
 
+ cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
+  if (err) console.log("ERROR "+err, err.stack); // an error occurred
+  else{
+  console.log(Object.values(data.Users));
+  } ;           // successful response
+});
 
- // Create a new Note according to the columns we defined earlier
- async function saveNote() {
+export default class App extends React.Component {
+
+ async  saveNote() {
   let newNote = {
     body: {
       "NoteTitle": "My first note!",
@@ -38,38 +45,35 @@ const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 
   // Use the API module to save the note to the database
   try {
-    const apiResponse = await API.put("NotesCRUD", path, newNote)
+    const apiResponse = await API.put("Notes", path, newNote)
     console.log("response from saving note: " + apiResponse);
     this.setState({apiResponse});
   } catch (e) {
     console.log(e);
   }
-}
+};
 
- async function getNote() {
+async getNote() {
   const path = "/Notes/object/" + this.state.noteId;
   try {
-    const apiResponse = await API.get("NotesCRUD", path);
+    const apiResponse = await API.get("Notes", path);
     console.log("response from getting note: " + apiResponse);
     this.setState({apiResponse});
   } catch (e) {
     console.log(e);
   }
-}
+};
 
-async function deleteNote() {
+async deleteNote() {
   const path = "/Notes/object/" + this.state.noteId;
   try {
-    const apiResponse = await API.del("NotesCRUD", path);
+    const apiResponse = await API.del("Notes", path);
     console.log("response from deleteing note: " + apiResponse);
     this.setState({apiResponse});
   } catch (e) {
     console.log(e);
   }
-}
-
-
-export default class App extends React.Component {
+};
 
   state = {
     apiResponse: null,
@@ -81,22 +85,30 @@ export default class App extends React.Component {
   }
 
 render(){
-    cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
-        if (err) console.log("ERROR "+err, err.stack); // an error occurred
-        else{
-        console.log(Object.values(data.Users));
-        } ;           // successful response
-      });
-
     return(
-        <View
-        
-        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-      >
-        <Text>Hey {Auth.user.username}!</Text>
-      </View>
+      <KeyboardAvoidingView style={styles.container}>
+      <Text>Response: {this.state.apiResponse && JSON.stringify(this.state.apiResponse)}</Text>
+      <Button title="Save Note" onPress={this.saveNote.bind(this)} />
+      <Button title="Get Note" onPress={this.getNote.bind(this)} />
+      <Button title="Delete Note" onPress={this.deleteNote.bind(this)} />
+      <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeNoteId}/>
+</KeyboardAvoidingView>
     )
 }
+};
 
-
-}
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  textInput: {
+      margin: 15,
+      height: 30,
+      width: 200,
+      borderWidth: 1,
+      color: 'green',
+      fontSize: 20,
+      backgroundColor: 'black'
+   }
+});
