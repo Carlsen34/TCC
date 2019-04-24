@@ -29,3 +29,7 @@ adb I  3333  3333 main.cpp:78]
 adb I  3768  3768 main.cpp:78] Android Debug Bridge version 1.0.36
 adb I  3768  3768 main.cpp:78] Revision af05c7354fe1-android
 adb I  3768  3768 main.cpp:78] 
+--- adb starting (pid 3480) ---
+adb I  3480  3480 main.cpp:78] Android Debug Bridge version 1.0.36
+adb I  3480  3480 main.cpp:78] Revision af05c7354fe1-android
+adb I  3480  3480 main.cpp:78] 

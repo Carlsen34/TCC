@@ -33,42 +33,18 @@ const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 
 export default class App extends React.Component {
 
- async  saveNote() {
-  let newNote = {
+ async  saveUser() {
+  let newUser = {
     body: {
-      "NoteTitle": "My first note!",
-      "NoteContent": "This is so cool!",
-      "NoteId": this.state.noteId
+      "Users": this.state.Users
     }
   }
-  const path = "/Notes";
+  const path = "/friendship";
 
   // Use the API module to save the note to the database
   try {
-    const apiResponse = await API.put("Notes", path, newNote)
+    const apiResponse = await API.put("Friendship", path, newUser)
     console.log("response from saving note: " + apiResponse);
-    this.setState({apiResponse});
-  } catch (e) {
-    console.log(e);
-  }
-};
-
-async getNote() {
-  const path = "/Notes/object/" + this.state.noteId;
-  try {
-    const apiResponse = await API.get("Notes", path);
-    console.log("response from getting note: " + apiResponse);
-    this.setState({apiResponse});
-  } catch (e) {
-    console.log(e);
-  }
-};
-
-async deleteNote() {
-  const path = "/Notes/object/" + this.state.noteId;
-  try {
-    const apiResponse = await API.del("Notes", path);
-    console.log("response from deleteing note: " + apiResponse);
     this.setState({apiResponse});
   } catch (e) {
     console.log(e);
@@ -77,21 +53,20 @@ async deleteNote() {
 
   state = {
     apiResponse: null,
-    noteId: ''
+    Users: ''
   };
       
-  handleChangeNoteId = (event) => {
-      this.setState({noteId: event});
+  handleChangeUser = (event) => {
+      this.setState({Users: event});
   }
 
 render(){
     return(
       <KeyboardAvoidingView style={styles.container}>
       <Text>Response: {this.state.apiResponse && JSON.stringify(this.state.apiResponse)}</Text>
-      <Button title="Save Note" onPress={this.saveNote.bind(this)} />
-      <Button title="Get Note" onPress={this.getNote.bind(this)} />
-      <Button title="Delete Note" onPress={this.deleteNote.bind(this)} />
-      <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeNoteId}/>
+      <Button title="Save User" onPress={this.saveUser.bind(this)} />
+     
+      <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
 </KeyboardAvoidingView>
     )
 }
