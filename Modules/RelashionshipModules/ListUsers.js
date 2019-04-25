@@ -20,45 +20,52 @@ AWS.config.update({
 const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 
  var params = {
-  UserPoolId: "us-east-1_pzJ6w0dlE",
+  UserPoolId: 'us-east-1_pzJ6w0dlE',
+  AttributesToGet:[],
  }
 
-
- cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
-  if (err) console.log("ERROR "+err, err.stack); // an error occurred
-  else{
-  console.log(Object.values(data.Users));
-  } ;           // successful response
-});
-
 export default class App extends React.Component {
-
- async  saveUser() {
-  let newUser = {
-    body: {
-      "Users": this.state.Users
-    }
-  }
-  const path = "/friendship";
-
-  // Use the API module to save the note to the database
-  try {
-    const apiResponse = await API.put("Friendship", path, newUser)
-    console.log("response from saving note: " + apiResponse);
-    this.setState({apiResponse});
-  } catch (e) {
-    console.log(e);
-  }
-};
 
   state = {
     apiResponse: null,
     Users: ''
   };
-      
+
   handleChangeUser = (event) => {
-      this.setState({Users: event});
-  }
+    this.setState({Users: event});
+}
+
+ async  saveUser() {
+    var friend = await this.state.Users;
+    await cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
+    if (err) console.log("ERROR "+err, err.stack); // an error occurred
+    else{
+      for(var resp in data.Users){
+        var objUsername = data.Users[resp].Username;
+        var objUserStatus = data.Users[resp].UserStatus;
+
+        if(friend == objUsername && objUserStatus == "CONFIRMED" ){
+          let newFriend = {
+            body: {
+              "Users": friend
+            }
+          }
+          const path = "/friendship";
+        
+          // Use the API module to save the note to the database
+          try {
+            const apiResponse =  API.put("Friendship", path, newFriend)
+            console.log("response from saving note: " + apiResponse);
+            this.setState({apiResponse});
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      }
+    } ;           // successful response
+  });
+
+ }
 
 render(){
     return(
@@ -71,6 +78,7 @@ render(){
     )
 }
 };
+
 
 const styles = StyleSheet.create({
   container: {
