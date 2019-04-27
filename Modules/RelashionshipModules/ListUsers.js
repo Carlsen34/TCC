@@ -40,7 +40,7 @@ export default class App extends React.Component {
 
 
 async getUser() {
-  const path = "/friendship/object/" + this.state.Users;
+  const path = "/friendship/object/" + Auth.user.username;
   try {
     const apiResponse = await API.get("Friendship", path);
     console.log("response from getting note: " + apiResponse.Friends);
@@ -68,11 +68,11 @@ async getUser() {
         if(user == objUsername && objUserStatus == "CONFIRMED" ){
           let newFriend = {
             body: {
-              "Users": user,
+              "Users": Auth.user.username,
               "Friends":friends
             }
           }
-          newFriend.body.Friends.push("Friend6");
+          newFriend.body.Friends.push(user);
           const path = "/friendship";
         
           // Use the API module to save the note to the database
