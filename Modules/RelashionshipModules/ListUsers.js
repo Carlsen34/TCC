@@ -28,15 +28,36 @@ export default class App extends React.Component {
 
   state = {
     apiResponse: null,
-    Users: ''
+    Users: '',
+    Friends:'',
   };
 
   handleChangeUser = (event) => {
     this.setState({Users: event});
 }
 
+
+
+
+async getUser() {
+  const path = "/friendship/object/" + this.state.Users;
+  try {
+    const apiResponse = await API.get("Friendship", path);
+    console.log("response from getting note: " + apiResponse.Friends);
+    this.setState({apiResponse});
+    this.setState({Friends:apiResponse.Friends});
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+
+
  async  saveUser() {
-    var friend = await this.state.Users;
+    await  this.getUser();
+    var user = await this.state.Users;
+    var friends = await this.state.Friends;
+
     await cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
     if (err) console.log("ERROR "+err, err.stack); // an error occurred
     else{
@@ -44,12 +65,14 @@ export default class App extends React.Component {
         var objUsername = data.Users[resp].Username;
         var objUserStatus = data.Users[resp].UserStatus;
 
-        if(friend == objUsername && objUserStatus == "CONFIRMED" ){
+        if(user == objUsername && objUserStatus == "CONFIRMED" ){
           let newFriend = {
             body: {
-              "Users": friend
+              "Users": user,
+              "Friends":friends
             }
           }
+          newFriend.body.Friends.push("Friend6");
           const path = "/friendship";
         
           // Use the API module to save the note to the database
@@ -71,8 +94,7 @@ render(){
     return(
       <KeyboardAvoidingView style={styles.container}>
       <Text>Response: {this.state.apiResponse && JSON.stringify(this.state.apiResponse)}</Text>
-      <Button title="Save User" onPress={this.saveUser.bind(this)} />
-     
+      <Button title="New Friend" onPress={this.saveUser.bind(this)} />
       <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
 </KeyboardAvoidingView>
     )
