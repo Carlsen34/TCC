@@ -30,10 +30,12 @@ export default class App extends React.Component {
     apiResponse: null,
     Users: '',
     Friends:'',
+    NewFriend:'',
+    hasFriend:false,
   };
 
   handleChangeUser = (event) => {
-    this.setState({Users: event});
+    this.setState({NewFriend: event});
 }
 
 
@@ -45,7 +47,11 @@ async getUser() {
     const apiResponse = await API.get("Friendship", path);
     console.log("response from getting note: " + apiResponse.Friends);
     this.setState({apiResponse});
-    this.setState({Friends:apiResponse.Friends});
+    if(apiResponse.Friends != undefined ){
+      this.setState({Friends:apiResponse.Friends});
+      this.setState({hasFriend:true});
+    }
+  
   } catch (e) {
     console.log(e);
   }
@@ -55,8 +61,11 @@ async getUser() {
 
  async  saveUser() {
     await  this.getUser();
+ 
     var user = await this.state.Users;
     var friends = await this.state.Friends;
+    var newFriends = await this.state.NewFriend;
+    var hasFriend = await this.state.hasFriend;
 
     await cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
     if (err) console.log("ERROR "+err, err.stack); // an error occurred
@@ -65,19 +74,34 @@ async getUser() {
         var objUsername = data.Users[resp].Username;
         var objUserStatus = data.Users[resp].UserStatus;
 
-        if(user == objUsername && objUserStatus == "CONFIRMED" ){
-          let newFriend = {
+        if(newFriends == objUsername && objUserStatus == "CONFIRMED" ){
+          let objNewFriend = {
             body: {
               "Users": Auth.user.username,
               "Friends":friends
             }
           }
-          newFriend.body.Friends.push(user);
+
+          // let objNewFriend2 = {
+          //   body: {
+          //     "Users": friends,
+          //     "Friends":Auth.user.username
+          //   }
+          // }
+
+          if(hasFriend == true){
+            objNewFriend.body.Friends.push(newFriends);
+          }else{
+            objNewFriend.body.Friends = [newFriends];
+          }
+
+
+         
           const path = "/friendship";
         
           // Use the API module to save the note to the database
           try {
-            const apiResponse =  API.put("Friendship", path, newFriend)
+            const apiResponse =  API.put("Friendship", path, objNewFriend)
             console.log("response from saving note: " + apiResponse);
             this.setState({apiResponse});
           } catch (e) {
@@ -95,6 +119,7 @@ render(){
       <KeyboardAvoidingView style={styles.container}>
       <Text>Response: {this.state.apiResponse && JSON.stringify(this.state.apiResponse)}</Text>
       <Button title="New Friend" onPress={this.saveUser.bind(this)} />
+      <Button title="Load Friend" onPress={this.getUser.bind(this)} />
       <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
 </KeyboardAvoidingView>
     )
