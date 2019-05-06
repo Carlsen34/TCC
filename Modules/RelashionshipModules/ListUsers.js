@@ -1,13 +1,10 @@
 import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView } from 'react-native';
+import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,Flatlist } from 'react-native';
 import Amplify,{ Auth,API } from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
 var AWS = require('aws-sdk');
 Amplify.configure(AWSConfig);
 
-
-//AWS.config.region = 'us-east-1';
-//AWS.config.credentials = 'us-east-1:f6f3c2c3-d521-4996-aa54-2d532dc6cb74';
 
 AWS.config.update({
     credentials: new AWS.CognitoIdentityCredentials({
@@ -39,6 +36,28 @@ export default class App extends React.Component {
 }
 
 
+async auxgetUser(){
+  var user = await Auth.user.username;
+  await this.getUser(user);
+}
+
+async auxFriend(){
+  var user = await Auth.user.username;
+  var newFriend = await this.state.NewFriend;
+  await this.newFriend(user,newFriend);
+  await this.newFriend(newFriend,user)
+}
+
+
+async auxDeleteUser(){
+  var user = await Auth.user.username;
+  var newFriend = await this.state.NewFriend;
+  await this.deleteUser(user,newFriend);
+  await this.deleteUser(newFriend,user)
+
+}
+
+
 
 
 async getUser(name) {
@@ -50,6 +69,7 @@ async getUser(name) {
     if(apiResponse.Friends != undefined ){
       this.setState({Friends:apiResponse.Friends});
       this.setState({hasFriend:true});
+      console.log("List Friends: " + this.state.Friends);
     }else{
       this.setState({hasFriend:false});
 
@@ -61,11 +81,9 @@ async getUser(name) {
 }
 
 
-async  deleteUser() {
-  var user = await Auth.user.username;
+async  deleteUser(user,newFriends) {
   await  this.getUser(user);
   var friends = await this.state.Friends;
-  var newFriends = await this.state.NewFriend;
   var hasFriend = await this.state.hasFriend;
 
   await cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
@@ -78,14 +96,12 @@ async  deleteUser() {
       if(newFriends == objUsername && objUserStatus == "CONFIRMED" ){
         let objNewFriend = {
           body: {
-            "Users": Auth.user.username,
+            "Users": user,
             "Friends":friends
           }
         }
 
         var indice = objNewFriend.body.Friends.indexOf(newFriends);
-          console.log("Friends : "+ newFriends);
-          console.log(objNewFriend);
         if(indice == -1){
           console.log("Cant unfriend");
         } else{
@@ -109,11 +125,10 @@ async  deleteUser() {
 }
 
 
- async  saveUser() {
-    var user = await Auth.user.username;
+
+ async  newFriend(user,newFriends) {
     await  this.getUser(user);
     var friends = await this.state.Friends;
-    var newFriends = await this.state.NewFriend;
     var hasFriend = await this.state.hasFriend;
 
     await cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
@@ -152,7 +167,7 @@ async  deleteUser() {
           console.log("Impossivel adicionar amigo");
         }
       }
-    } ;           // successful response
+    } ;           
   });
 
  }
@@ -160,9 +175,11 @@ async  deleteUser() {
 render(){
     return(
       <KeyboardAvoidingView style={styles.container}>
-      <Button title="New Friend" onPress={this.saveUser.bind(this)} />
-      <Button title="Load Friend" onPress={this.getUser.bind(this)} />
-      <Button title="Delete Friend" onPress={this.deleteUser.bind(this)} />
+      <Button title="New Friend" onPress={this.auxFriend.bind(this)} />
+      <Button title="List Friend" onPress={this.auxgetUser.bind(this)} />
+      <Button title="Delete Friend" onPress={this.auxDeleteUser.bind(this)} />
+      <Text>{this.state.Friends}</Text>
+
       <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
 </KeyboardAvoidingView>
     )
@@ -172,7 +189,8 @@ render(){
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    margin: 30,
+    flex: 5,
     backgroundColor: '#fff',
   },
   textInput: {
@@ -180,8 +198,6 @@ const styles = StyleSheet.create({
       height: 30,
       width: 200,
       borderWidth: 1,
-      color: 'green',
       fontSize: 20,
-      backgroundColor: 'black'
    }
 });
