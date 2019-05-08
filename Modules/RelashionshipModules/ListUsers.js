@@ -1,10 +1,11 @@
 import React from 'react';
 import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,Flatlist } from 'react-native';
-import Amplify,{ Auth,API } from 'aws-amplify';
+import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
 var AWS = require('aws-sdk');
 Amplify.configure(AWSConfig);
 
+Analytics.disable();
 
 AWS.config.update({
     credentials: new AWS.CognitoIdentityCredentials({
@@ -75,6 +76,7 @@ async getUser(name) {
 
     }
   
+    return apiResponse;
   } catch (e) {
     console.log(e);
   }
@@ -113,6 +115,7 @@ async  deleteUser(user,newFriends) {
             const apiResponse =  API.put("Friendship", path, objNewFriend)
             console.log("response from saving note: " + apiResponse);
             this.setState({apiResponse});
+            return apiResponse;
           } catch (e) {
             console.log(e);
           }
@@ -159,6 +162,7 @@ async  deleteUser(user,newFriends) {
             const apiResponse =  API.put("Friendship", path, objNewFriend)
             console.log("response from saving note: " + apiResponse);
             this.setState({apiResponse});
+            return apiResponse;
           } catch (e) {
             console.log(e);
           }

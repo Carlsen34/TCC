@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
-import Amplify, { Auth } from 'aws-amplify';
+import Amplify, { Auth,Analytics } from 'aws-amplify';
 import AWSConfig from './aws-exports';
 Amplify.configure(AWSConfig);
-
+Analytics.disable();
 
 
 import Tabs from './Modules/AuthenticationModules/Tabs';

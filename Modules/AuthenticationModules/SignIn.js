@@ -21,6 +21,7 @@ export default class App extends React.Component {
         this.setState({ user });
         console.log('successful sign in!');
         this.props.screenProps.authenticate(true);
+        
       })
       .catch(err => console.log('error signing in!: ', err));
   }

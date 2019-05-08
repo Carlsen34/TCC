@@ -125,7 +125,10 @@ app.get(path + '/object' + hashKeyPath + sortKeyPath, function(req, res) {
       }
     }
   });
-});
+}
+  console.log(path);
+
+);
 
 
 /************************************
