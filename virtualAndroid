@@ -1,3 +1,0 @@
-cd
-cd Android/Sdk/emulator
-sudo ./emulator -avd Nexus_5X_API_28

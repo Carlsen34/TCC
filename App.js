@@ -8,9 +8,7 @@ Analytics.disable();
 
 
 import Tabs from './Modules/AuthenticationModules/Tabs';
-import ListUsers from './Modules/RelashionshipModules/ListUsers';
-//import Tabs from './Tabs';
-
+import OptionsTabs from './Modules/OptionsTabs'
 export default class App extends React.Component {
   state = {
     isAuthenticated: false,
@@ -22,7 +20,7 @@ export default class App extends React.Component {
     if (this.state.isAuthenticated) {
       console.log('Auth: ', Auth);
       return (
-        <ListUsers/>
+        <OptionsTabs/>
       );
     }
     return (
