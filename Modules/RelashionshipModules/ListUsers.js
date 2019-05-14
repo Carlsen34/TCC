@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,Flatlist } from 'react-native';
+import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList } from 'react-native';
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
 var AWS = require('aws-sdk');
@@ -30,6 +30,13 @@ export default class App extends React.Component {
     Friends:'',
     NewFriend:'',
     hasFriend:false,
+    data: [
+      { id: 0, full_name: 'Repo 1' },
+      { id: 1, full_name: 'Repo 2' },
+      { id: 2, full_name: 'Repo 3' },
+      { id: 3, full_name: 'Repo 4' },
+      { id: 4, full_name: 'Repo 5' },
+    ],
   };
 
   handleChangeUser = (event) => {
@@ -176,13 +183,27 @@ async  deleteUser(user,newFriends) {
 
  }
 
+
+ renderItem = ({ item }) => (
+  <View style={styles.listItem}>
+    <Text>{item.full_name}</Text>
+  </View>
+);
+
 render(){
     return(
       <KeyboardAvoidingView style={styles.container}>
       <Button title="New Friend" onPress={this.auxFriend.bind(this)} />
       <Button title="List Friend" onPress={this.auxgetUser.bind(this)} />
       <Button title="Delete Friend" onPress={this.auxDeleteUser.bind(this)} />
-      <Text>{this.state.Friends}</Text>
+      
+      <FlatList
+        style={{ marginTop: 30 }}
+        contentContainerStyle={styles.list}
+        data={this.state.data}
+        renderItem={this.renderItem}
+        keyExtractor={item => item.id}
+      />
 
       <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
 </KeyboardAvoidingView>
@@ -203,5 +224,14 @@ const styles = StyleSheet.create({
       width: 200,
       borderWidth: 1,
       fontSize: 20,
-   }
+   },  list: {
+    paddingHorizontal: 20,
+  },  
+  listItem: {
+    backgroundColor: '#EEE',
+    marginTop: 20,
+    padding: 30,
+  },
+
+   
 });
