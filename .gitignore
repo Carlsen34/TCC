@@ -12,7 +12,7 @@ aws-info.json
 project-info.json
 awsmobilejs/.awsmobile/backend-build
 awsmobilejs/\#current-backend-info
-
+aws-exports.js 
 
 #amplify
 amplify/\#current-cloud-backend

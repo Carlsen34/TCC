@@ -9,16 +9,16 @@ Analytics.disable();
 
 AWS.config.update({
     credentials: new AWS.CognitoIdentityCredentials({
-      IdentityPoolId: 'us-east-1:f6f3c2c3-d521-4996-aa54-2d532dc6cb74',
+      IdentityPoolId: AWSConfig.aws_cognito_identity_pool_id
     }),
-    region: 'us-east-1'
+    region: AWSConfig.aws_project_region
   });
 
 
 const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 
  var params = {
-  UserPoolId: 'us-east-1_pzJ6w0dlE',
+  UserPoolId: AWSConfig.aws_user_pools_id,
   AttributesToGet:[],
  }
 

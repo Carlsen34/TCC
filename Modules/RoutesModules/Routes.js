@@ -1,5 +1,6 @@
 
 import React, { Component } from 'react';
+import AWSConfig from '../../aws-exports';
 import {
   View,
   TouchableHighlight,
@@ -8,6 +9,7 @@ import {
   TextInput,
   Dimensions,
   Image,
+  KeyboardAvoidingView,
   StyleSheet
 } from 'react-native';
 
@@ -18,7 +20,7 @@ import { PermissionsAndroid } from 'react-native';
 
 import Geocoder from 'react-native-geocoding';
 
-const GOOGLE_MAPS_APIKEY = 'AIzaSyBNWlA0LdrEMFEww_o6_tWGltDG2kS5I_Y';
+const GOOGLE_MAPS_APIKEY = AWSConfig.GOOGLEAPI;
 
 const backgroundColor = '#007256';
 
@@ -163,7 +165,7 @@ export default class MapScreen extends Component {
 
         return(
 
-            <View style={styles.container}>
+            <KeyboardAvoidingView style={styles.container}>
 
             <MapView
     
@@ -207,7 +209,7 @@ export default class MapScreen extends Component {
     
             </MapView>
 
-            <View style={styles.inputContainer}>
+            <KeyboardAvoidingView style={styles.inputContainer}>
 
                 <TextInput
                     style={styles.input}
@@ -229,9 +231,9 @@ export default class MapScreen extends Component {
 
                 </TouchableOpacity>
     
-            </View>
+            </KeyboardAvoidingView>
 
-          </View>
+          </KeyboardAvoidingView>
 
         );
 
