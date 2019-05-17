@@ -165,7 +165,7 @@ export default class MapScreen extends Component {
 
         return(
 
-            <KeyboardAvoidingView style={styles.container}>
+            <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
 
             <MapView
     
@@ -209,7 +209,7 @@ export default class MapScreen extends Component {
     
             </MapView>
 
-            <KeyboardAvoidingView style={styles.inputContainer}>
+          
 
                 <TextInput
                     style={styles.input}
@@ -232,8 +232,6 @@ export default class MapScreen extends Component {
                 </TouchableOpacity>
     
             </KeyboardAvoidingView>
-
-          </KeyboardAvoidingView>
 
         );
 

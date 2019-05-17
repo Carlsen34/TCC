@@ -30,13 +30,7 @@ export default class App extends React.Component {
     Friends:'',
     NewFriend:'',
     hasFriend:false,
-    data: [
-      { id: 0, full_name: 'Repo 1' },
-      { id: 1, full_name: 'Repo 2' },
-      { id: 2, full_name: 'Repo 3' },
-      { id: 3, full_name: 'Repo 4' },
-      { id: 4, full_name: 'Repo 5' },
-    ],
+
   };
 
   handleChangeUser = (event) => {
@@ -54,6 +48,7 @@ async auxFriend(){
   var newFriend = await this.state.NewFriend;
   await this.newFriend(user,newFriend);
   await this.newFriend(newFriend,user)
+  await this.getUser(user);
 }
 
 
@@ -62,6 +57,7 @@ async auxDeleteUser(){
   var newFriend = await this.state.NewFriend;
   await this.deleteUser(user,newFriend);
   await this.deleteUser(newFriend,user)
+  await this.getUser(user);
 
 }
 
@@ -186,23 +182,34 @@ async  deleteUser(user,newFriends) {
 
  renderItem = ({ item }) => (
   <View style={styles.listItem}>
-    <Text>{item.full_name}</Text>
+    <Text>{item}</Text>
   </View>
 );
 
+
+componentWillMount(){
+  var user = Auth.user.username;
+  this.getUser(user);
+}
+
 render(){
     return(
-      <KeyboardAvoidingView style={styles.container}>
-      <Button title="New Friend" onPress={this.auxFriend.bind(this)} />
-      <Button title="List Friend" onPress={this.auxgetUser.bind(this)} />
-      <Button title="Delete Friend" onPress={this.auxDeleteUser.bind(this)} />
+      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+      <Button 
+      title="New Friend"
+       onPress={this.auxFriend.bind(this)} 
+       style={styles.input} />
+      <Button 
+      title="Delete Friend"
+       onPress={this.auxDeleteUser.bind(this)}  
+       style={styles.input}/>
       
       <FlatList
         style={{ marginTop: 30 }}
         contentContainerStyle={styles.list}
-        data={this.state.data}
+        data={this.state.Friends}
         renderItem={this.renderItem}
-        keyExtractor={item => item.id}
+       // keyExtractor={item => item.id}
       />
 
       <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
@@ -217,6 +224,8 @@ const styles = StyleSheet.create({
     margin: 30,
     flex: 5,
     backgroundColor: '#fff',
+    padding: 16,
+
   },
   textInput: {
       margin: 15,
@@ -232,6 +241,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 30,
   },
-
+  input: {
+    height: 50,
+    borderBottomWidth: 2,
+    borderBottomColor: '#2196F3',
+    margin: 10,
+  }
    
 });
