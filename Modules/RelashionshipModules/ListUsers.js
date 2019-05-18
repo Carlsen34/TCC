@@ -15,6 +15,9 @@ AWS.config.update({
   });
 
 
+
+
+
 const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 
  var params = {
@@ -190,7 +193,7 @@ async  deleteUser(user,newFriends) {
 componentWillMount(){
   var user = Auth.user.username;
   this.getUser(user);
-}
+ }
 
 render(){
     return(
@@ -209,7 +212,7 @@ render(){
         contentContainerStyle={styles.list}
         data={this.state.Friends}
         renderItem={this.renderItem}
-       // keyExtractor={item => item.id}
+        keyExtractor={(item, index) => index.toString()}
       />
 
       <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
