@@ -1,7 +1,9 @@
 import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView } from 'react-native';
+import { TextInput, Button, StyleSheet,KeyboardAvoidingView} from 'react-native';
 
 import { Auth } from 'aws-amplify';
+
+
 
 export default class App extends React.Component {
   state = {
@@ -9,12 +11,14 @@ export default class App extends React.Component {
     password: '',
     user: {},
   };
+  
   onChangeText(key, value) {
     this.setState({
       [key]: value,
     });
   }
-  signIn() {
+
+  signIn() {   
     const { username, password } = this.state;
     Auth.signIn(username, password)
       .then(user => {
@@ -23,24 +27,32 @@ export default class App extends React.Component {
         this.props.screenProps.authenticate(true);
         
       })
-      .catch(err => console.log('error signing in!: ', err));
+      .catch(err => {
+        showAlert();
+        console.log('error signing in!: ', err)
+      });
+      
   }
 
   render() {
+
+    
     return (
       <KeyboardAvoidingView style={styles.container} behavior="padding">
+
         <TextInput
           onChangeText={value => this.onChangeText('username', value)}
           style={styles.input}
           placeholder="username"
         />
+      
         <TextInput
           onChangeText={value => this.onChangeText('password', value)}
           style={styles.input}
           secureTextEntry={true}
           placeholder="password"
         />
-        <Button title="Sign In" onPress={this.signIn.bind(this)} />    
+      <Button title="Sign In" onPress={this.signIn.bind(this)} />    
       </KeyboardAvoidingView>
     );
   }

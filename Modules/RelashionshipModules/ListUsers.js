@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList } from 'react-native';
+import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator} from 'react-native';
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
 var AWS = require('aws-sdk');
@@ -13,10 +13,6 @@ AWS.config.update({
     }),
     region: AWSConfig.aws_project_region
   });
-
-
-
-
 
 const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 
@@ -33,7 +29,7 @@ export default class App extends React.Component {
     Friends:'',
     NewFriend:'',
     hasFriend:false,
-
+    animating:true
   };
 
   handleChangeUser = (event) => {
@@ -42,26 +38,32 @@ export default class App extends React.Component {
 
 
 async auxgetUser(){
+  this.setState({animating:true})
   var user = await Auth.user.username;
   await this.getUser(user);
+  this.setState({animating:false})
 }
 
 async auxFriend(){
+  this.setState({animating:true})
   var user = await Auth.user.username;
   var newFriend = await this.state.NewFriend;
   await this.newFriend(user,newFriend);
   await this.newFriend(newFriend,user)
   await this.getUser(user);
+  this.setState({animating:false})
+
 }
 
 
 async auxDeleteUser(){
+  this.setState({animating:true})
   var user = await Auth.user.username;
   var newFriend = await this.state.NewFriend;
   await this.deleteUser(user,newFriend);
   await this.deleteUser(newFriend,user)
   await this.getUser(user);
-
+  this.setState({animating:false})
 }
 
 
@@ -146,7 +148,7 @@ async  deleteUser(user,newFriends) {
       for(var resp in data.Users){
         var objUsername = data.Users[resp].Username;
         var objUserStatus = data.Users[resp].UserStatus;
-
+       
         if(objUsername != user && newFriends == objUsername && objUserStatus == "CONFIRMED" ){
           let objNewFriend = {
             body: {
@@ -156,6 +158,11 @@ async  deleteUser(user,newFriends) {
           }
 
           if(hasFriend == true){
+            for(var resp in  objNewFriend.body.Friends){
+              if(objNewFriend.body.Friends[resp] == newFriends ){
+                return
+              }
+            }
             objNewFriend.body.Friends.push(newFriends);
           }else{
             objNewFriend.body.Friends = [newFriends];
@@ -191,9 +198,8 @@ async  deleteUser(user,newFriends) {
 
 
 componentWillMount(){
-  var user = Auth.user.username;
-  this.getUser(user);
- }
+   this.auxgetUser();
+  }
 
 render(){
     return(
@@ -207,6 +213,12 @@ render(){
        onPress={this.auxDeleteUser.bind(this)}  
        style={styles.input}/>
       
+      <ActivityIndicator
+       size="large" 
+       color="#0000ff" 
+       animating = {this.state.animating}/>
+
+
       <FlatList
         style={{ marginTop: 30 }}
         contentContainerStyle={styles.list}
