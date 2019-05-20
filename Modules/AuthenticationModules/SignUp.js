@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView } from 'react-native';
+import { TextInput, Button, StyleSheet,KeyboardAvoidingView } from 'react-native';
 import Amplify,{ Auth } from 'aws-amplify';
 
 
@@ -23,13 +23,26 @@ export default class App extends React.Component {
         email: this.state.email,
       },
     })
-      .then(() => console.log('successful sign up!'))
-      .catch(err => console.log('error signing up!: ', err));
+      .then(() => {
+        alert('successful sign up!');
+        console.log('successful sign up!')
+      }
+      )
+      .catch(err => { 
+        alert('error signing up!: '+ err.message);
+        console.log('error signing up!: ', err)
+    });
   }
   confirmSignUp() {
     Auth.confirmSignUp(this.state.username, this.state.confirmationCode)
-      .then(() => console.log('successful confirm sign up!'))
-      .catch(err => console.log('error confirming signing up!: ', err));
+      .then(() => {
+        alert('successful confirm sign up!');
+        console.log('successful confirm sign up!')
+      })
+      .catch(err => {
+        alert('error confirming signing up!: '+ err.message);
+        console.log('error confirming signing up!: ', err)
+    });
   }
   render() {
     return (

@@ -39,31 +39,34 @@ export default class App extends React.Component {
 
 async auxgetUser(){
   this.setState({animating:true})
-  var user = await Auth.user.username;
-  await this.getUser(user);
+  var user = Auth.user.username;
+   this.getUser(user);
   this.setState({animating:false})
 }
 
 async auxFriend(){
   this.setState({animating:true})
-  var user = await Auth.user.username;
-  var newFriend = await this.state.NewFriend;
+  var user =  Auth.user.username;
+  var newFriend =  this.state.NewFriend;
   await this.newFriend(user,newFriend);
   await this.newFriend(newFriend,user)
   await this.getUser(user);
   this.setState({animating:false})
-
+  alert('Friendship added successfully');
 }
 
 
 async auxDeleteUser(){
   this.setState({animating:true})
-  var user = await Auth.user.username;
-  var newFriend = await this.state.NewFriend;
+  var user =  Auth.user.username;
+  var newFriend =  this.state.NewFriend;
   await this.deleteUser(user,newFriend);
   await this.deleteUser(newFriend,user)
   await this.getUser(user);
   this.setState({animating:false})
+  alert('Friendship successfully disbanded!');
+
+
 }
 
 
@@ -94,8 +97,6 @@ async getUser(name) {
 async  deleteUser(user,newFriends) {
   await  this.getUser(user);
   var friends = await this.state.Friends;
-  var hasFriend = await this.state.hasFriend;
-
   await cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
   if (err) console.log("ERROR "+err, err.stack); // an error occurred
   else{
@@ -125,6 +126,7 @@ async  deleteUser(user,newFriends) {
             this.setState({apiResponse});
             return apiResponse;
           } catch (e) {
+         
             console.log(e);
           }
         }
@@ -202,25 +204,41 @@ componentWillMount(){
   }
 
 render(){
+    if(this.state.animating){
+      return ( 
+     <KeyboardAvoidingView style={styles.container} behavior="padding" enabled> 
+       <Button 
+      title="New Friend"
+       onPress={this.auxFriend.bind(this)} 
+       />
+       <Text></Text>
+      <Button 
+      title="Delete Friend"
+       onPress={this.auxDeleteUser.bind(this)}  
+       /> 
+      <ActivityIndicator
+        size="large" 
+        color="#0000ff" 
+        animating = {this.state.animating}/>
+
+        </KeyboardAvoidingView>
+        )
+    }
+    if(!this.state.animating){
     return(
       <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
       <Button 
       title="New Friend"
        onPress={this.auxFriend.bind(this)} 
-       style={styles.input} />
+       />
+       <Text></Text>
       <Button 
       title="Delete Friend"
        onPress={this.auxDeleteUser.bind(this)}  
-       style={styles.input}/>
-      
-      <ActivityIndicator
-       size="large" 
-       color="#0000ff" 
-       animating = {this.state.animating}/>
-
+       />    
 
       <FlatList
-        style={{ marginTop: 30 }}
+        style={{ marginTop: 15 }}
         contentContainerStyle={styles.list}
         data={this.state.Friends}
         renderItem={this.renderItem}
@@ -230,6 +248,7 @@ render(){
       <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
 </KeyboardAvoidingView>
     )
+  }
 }
 };
 

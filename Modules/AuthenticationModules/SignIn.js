@@ -1,6 +1,5 @@
 import React from 'react';
 import { TextInput, Button, StyleSheet,KeyboardAvoidingView} from 'react-native';
-
 import { Auth } from 'aws-amplify';
 
 
@@ -28,8 +27,8 @@ export default class App extends React.Component {
         
       })
       .catch(err => {
-        showAlert();
-        console.log('error signing in!: ', err)
+        alert('error signing in!: '+ err.message);
+        console.log('error signing in!: ', err);
       });
       
   }
