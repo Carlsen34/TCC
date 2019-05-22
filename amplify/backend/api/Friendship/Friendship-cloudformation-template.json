@@ -15,15 +15,15 @@
         },
     
     
-          "functionfirendshipFunctionName": {
+          "functionfriendshipName": {
             "Type": "String",
-            "Default": "functionfirendshipFunctionName"
+            "Default": "functionfriendshipName"
           },
         
           
-          "functionfirendshipFunctionArn": {
+          "functionfriendshipArn": {
             "Type": "String",
-            "Default": "functionfirendshipFunctionArn"
+            "Default": "functionfriendshipArn"
           }
         
           
@@ -174,7 +174,7 @@
                             
                             {
                                 
-                                "Ref": "functionfirendshipFunctionArn"
+                                "Ref": "functionfriendshipArn"
                             },
                             
                             "/invocations"
@@ -273,7 +273,7 @@
                           
                           {
                             
-                            "Ref": "functionfirendshipFunctionArn"
+                            "Ref": "functionfriendshipArn"
                           },
                           
                           "/invocations"
@@ -330,12 +330,12 @@
                   
         
         
-        "functionfirendshipFunctionPermissionFriendship": {
+        "functionfriendshipPermissionFriendship": {
             "Type": "AWS::Lambda::Permission",
             "Properties": {
                 "FunctionName": 
                     {
-                        "Ref":  "functionfirendshipFunctionName"
+                        "Ref":  "functionfriendshipName"
                     },
                     
                     "Action": "lambda:InvokeFunction",

@@ -17,7 +17,7 @@ import MapView from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import getDirections from 'react-native-google-maps-directions'
 import { PermissionsAndroid } from 'react-native';
-
+import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import Geocoder from 'react-native-geocoding';
 
 const GOOGLE_MAPS_APIKEY = AWSConfig.GOOGLEAPI;
@@ -32,8 +32,12 @@ export default class MapScreen extends Component {
 
         origin: { latitude: 42.3616132, longitude: -71.0672576 },
         destination: { latitude: 42.3730591, longitude: -71.033754 },
+        waypoints:'',
         originText: '',
         destinationText: '',
+        waypointsText:'',
+        routeName:'',
+       
     
       };
     
@@ -94,6 +98,49 @@ export default class MapScreen extends Component {
         }
 
         this.getLocation();
+
+      }
+
+
+
+
+      saveButton = () => {
+          var user = Auth.user.username;
+          var origin = this.state.originText
+          var destination = this.state.destinationText
+          var waypoints = "ASD" //this.state.waypointsText
+          var routeName = "TESTE" //this.state.routeName
+
+          let objRoutes = {
+            body: {
+              "routeName": routeName,
+              "user": user,
+              "origin":origin,
+              "destination": destination,
+              //"waypoints":waypoints
+              
+              
+            }
+          }
+
+
+
+        
+          console.log(objRoutes);
+
+          const path = "/routes";
+        
+          // Use the API module to save the routes to the database
+          try {
+            const apiResponse =  API.put("Routes", path, objRoutes)
+            console.log("response from saving routes: " + apiResponse);
+            this.setState({apiResponse});
+            alert('Route saved successfully');
+            return apiResponse;
+          } catch (e) {
+            console.log(e);
+          }
+      
 
       }
 
@@ -214,20 +261,26 @@ export default class MapScreen extends Component {
                 <TextInput
                     style={styles.input}
                     onChangeText={(text) => this.setState({ originText: text })}
-                    placeholder='Origem'
+                    placeholder='Origin'
                     value={this.state.originText}
                 />
 
                  <TextInput
                     style={styles.input}
                     onChangeText={(text) => this.setState({ destinationText: text })}
-                    placeholder='Destino'
+                    placeholder='Destination'
                     value={this.state.destinationText}
                 />
 
                 <TouchableOpacity style={styles.button} onPress={this.handleButton}>
 
-                    <Text style={styles.buttonText}>Buscar rota</Text>
+                    <Text style={styles.buttonText}>Search Route</Text>
+
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.button} onPress={this.saveButton}>
+
+                    <Text style={styles.buttonText}>Save Route</Text>
 
                 </TouchableOpacity>
     

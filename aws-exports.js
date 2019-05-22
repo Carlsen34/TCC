@@ -2,33 +2,31 @@
 
 const awsmobile = {
     "GOOGLEAPI":"AIzaSyBNWlA0LdrEMFEww_o6_tWGltDG2kS5I_Y",
-    
     "aws_cognito_identity_pool_id": "us-east-1:f6f3c2c3-d521-4996-aa54-2d532dc6cb74",
     "aws_cognito_region": "us-east-1",
     "aws_user_pools_id": "us-east-1_pzJ6w0dlE",
     "aws_user_pools_web_client_id": "1ljs1mhq1hed7ieoruofvq8lri",
-
     "aws_project_region": "us-east-1",
     "aws_dynamodb_all_tables_region": "us-east-1",
     "aws_dynamodb_table_schemas": [
         {
-            "tableName": "dynamoRelashionship-tcc",
+            "tableName": "friendship-tcc",
             "region": "us-east-1"
         },
         {
-            "tableName": "Notes-tcc",
+            "tableName": "routes-tcc",
             "region": "us-east-1"
         }
     ],
     "aws_cloud_logic_custom": [
         {
             "name": "Friendship",
-            "endpoint": "https://g5pla0m423.execute-api.us-east-1.amazonaws.com/tcc",
+            "endpoint": "https://ljp232czoj.execute-api.us-east-1.amazonaws.com/tcc",
             "region": "us-east-1"
         },
         {
-            "name": "Notes",
-            "endpoint": "https://v2swpiaq2c.execute-api.us-east-1.amazonaws.com/tcc",
+            "name": "Routes",
+            "endpoint": "https://dwe2f7iko9.execute-api.us-east-1.amazonaws.com/tcc",
             "region": "us-east-1"
         }
     ]

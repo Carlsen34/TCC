@@ -1,14 +1,14 @@
 {
     "tcc": {
         "awscloudformation": {
-            "AuthRoleName": "tcc-20190423183333-authRole",
-            "UnauthRoleArn": "arn:aws:iam::759354255071:role/tcc-20190423183333-unauthRole",
-            "AuthRoleArn": "arn:aws:iam::759354255071:role/tcc-20190423183333-authRole",
+            "AuthRoleName": "tcc-20190521225853-authRole",
+            "UnauthRoleArn": "arn:aws:iam::759354255071:role/tcc-20190521225853-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::759354255071:role/tcc-20190521225853-authRole",
             "Region": "us-east-1",
-            "DeploymentBucketName": "tcc-20190423183333-deployment",
-            "UnauthRoleName": "tcc-20190423183333-unauthRole",
-            "StackName": "tcc-20190423183333",
-            "StackId": "arn:aws:cloudformation:us-east-1:759354255071:stack/tcc-20190423183333/72ec6b70-660f-11e9-8976-0a1b7b252ffe"
+            "DeploymentBucketName": "tcc-20190521225853-deployment",
+            "UnauthRoleName": "tcc-20190521225853-unauthRole",
+            "StackName": "tcc-20190521225853",
+            "StackId": "arn:aws:cloudformation:us-east-1:759354255071:stack/tcc-20190521225853/277f0ee0-7c35-11e9-a03f-0ad7f2019cc4"
         }
     }
 }

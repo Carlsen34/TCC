@@ -73,6 +73,7 @@ async auxDeleteUser(){
 
 
 async getUser(name) {
+  console.log(name);
   const path = "/friendship/object/" + name;
   try {
     const apiResponse = await API.get("Friendship", path);

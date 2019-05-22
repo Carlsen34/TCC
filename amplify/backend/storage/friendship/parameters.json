@@ -1,0 +1,5 @@
+{
+    "tableName": "friendship",
+    "partitionKeyName": "Users",
+    "partitionKeyType": "S"
+}

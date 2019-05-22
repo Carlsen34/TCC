@@ -2,7 +2,7 @@
     "paths": [
         {
             "name": "/friendship",
-            "lambdaFunction": "firendshipFunction",
+            "lambdaFunction": "friendship",
             "privacy": {
                 "open": true
             }
@@ -12,19 +12,19 @@
     "apiName": "Friendship",
     "functionArns": [
         {
-            "lambdaFunction": "firendshipFunction"
+            "lambdaFunction": "friendship"
         }
     ],
     "privacy": {
         "auth": 0,
         "unauth": 0,
-        "authRoleName": "tcc-20190423183333-authRole",
-        "unAuthRoleName": "tcc-20190423183333-unauthRole"
+        "authRoleName": "tcc-20190521225853-authRole",
+        "unAuthRoleName": "tcc-20190521225853-unauthRole"
     },
     "dependsOn": [
         {
             "category": "function",
-            "resourceName": "firendshipFunction",
+            "resourceName": "friendship",
             "attributes": [
                 "Name",
                 "Arn"

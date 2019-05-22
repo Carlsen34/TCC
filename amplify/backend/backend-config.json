@@ -1,23 +1,23 @@
 {
 	"storage": {
-		"dynamoRelashionship": {
+		"friendship": {
 			"service": "DynamoDB",
 			"providerPlugin": "awscloudformation"
 		},
-		"Notes": {
+		"routes": {
 			"service": "DynamoDB",
 			"providerPlugin": "awscloudformation"
 		}
 	},
 	"function": {
-		"firendshipFunction": {
+		"friendship": {
 			"service": "Lambda",
 			"providerPlugin": "awscloudformation",
 			"build": true,
 			"dependsOn": [
 				{
 					"category": "storage",
-					"resourceName": "dynamoRelashionship",
+					"resourceName": "friendship",
 					"attributes": [
 						"Name",
 						"Arn"
@@ -25,14 +25,14 @@
 				}
 			]
 		},
-		"NotesCRUDFunction": {
+		"routes": {
 			"service": "Lambda",
 			"providerPlugin": "awscloudformation",
 			"build": true,
 			"dependsOn": [
 				{
 					"category": "storage",
-					"resourceName": "Notes",
+					"resourceName": "routes",
 					"attributes": [
 						"Name",
 						"Arn"
@@ -48,7 +48,7 @@
 			"dependsOn": [
 				{
 					"category": "function",
-					"resourceName": "firendshipFunction",
+					"resourceName": "friendship",
 					"attributes": [
 						"Name",
 						"Arn"
@@ -56,13 +56,13 @@
 				}
 			]
 		},
-		"Notes": {
+		"Routes": {
 			"service": "API Gateway",
 			"providerPlugin": "awscloudformation",
 			"dependsOn": [
 				{
 					"category": "function",
-					"resourceName": "NotesCRUDFunction",
+					"resourceName": "routes",
 					"attributes": [
 						"Name",
 						"Arn"

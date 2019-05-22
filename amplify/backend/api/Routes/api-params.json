@@ -1,0 +1,34 @@
+{
+    "paths": [
+        {
+            "name": "/routes",
+            "lambdaFunction": "routes",
+            "privacy": {
+                "open": true
+            }
+        }
+    ],
+    "resourceName": "Routes",
+    "apiName": "Routes",
+    "functionArns": [
+        {
+            "lambdaFunction": "routes"
+        }
+    ],
+    "privacy": {
+        "auth": 0,
+        "unauth": 0,
+        "authRoleName": "tcc-20190521225853-authRole",
+        "unAuthRoleName": "tcc-20190521225853-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "routes",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}
