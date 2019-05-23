@@ -7,6 +7,10 @@
 		"routes": {
 			"service": "DynamoDB",
 			"providerPlugin": "awscloudformation"
+		},
+		"getRoute": {
+			"service": "DynamoDB",
+			"providerPlugin": "awscloudformation"
 		}
 	},
 	"function": {
@@ -39,6 +43,21 @@
 					]
 				}
 			]
+		},
+		"getRoute": {
+			"service": "Lambda",
+			"providerPlugin": "awscloudformation",
+			"build": true,
+			"dependsOn": [
+				{
+					"category": "storage",
+					"resourceName": "getRoute",
+					"attributes": [
+						"Name",
+						"Arn"
+					]
+				}
+			]
 		}
 	},
 	"api": {
@@ -63,6 +82,20 @@
 				{
 					"category": "function",
 					"resourceName": "routes",
+					"attributes": [
+						"Name",
+						"Arn"
+					]
+				}
+			]
+		},
+		"getRoute": {
+			"service": "API Gateway",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": [
+				{
+					"category": "function",
+					"resourceName": "getRoute",
 					"attributes": [
 						"Name",
 						"Arn"

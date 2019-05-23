@@ -16,6 +16,10 @@ const awsmobile = {
         {
             "tableName": "routes-tcc",
             "region": "us-east-1"
+        },
+        {
+            "tableName": "getRoute-tcc",
+            "region": "us-east-1"
         }
     ],
     "aws_cloud_logic_custom": [
@@ -27,6 +31,11 @@ const awsmobile = {
         {
             "name": "Routes",
             "endpoint": "https://dwe2f7iko9.execute-api.us-east-1.amazonaws.com/tcc",
+            "region": "us-east-1"
+        },
+        {
+            "name": "getRoute",
+            "endpoint": "https://fdl7lwcb2m.execute-api.us-east-1.amazonaws.com/tcc",
             "region": "us-east-1"
         }
     ]

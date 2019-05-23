@@ -119,3 +119,16 @@ adb I  4410  4410 main.cpp:78]
 adb I  2167  2167 main.cpp:78] Android Debug Bridge version 1.0.36
 adb I  2167  2167 main.cpp:78] Revision af05c7354fe1-android
 adb I  2167  2167 main.cpp:78] 
+--- adb starting (pid 3009) ---
+adb I  3009  3009 main.cpp:78] Android Debug Bridge version 1.0.36
+adb I  3009  3009 main.cpp:78] Revision af05c7354fe1-android
+adb I  3009  3009 main.cpp:78] 
+adb server killed by remote request
+--- adb starting (pid 9461) ---
+adb I  9461  9461 main.cpp:78] Android Debug Bridge version 1.0.36
+adb I  9461  9461 main.cpp:78] Revision af05c7354fe1-android
+adb I  9461  9461 main.cpp:78] 
+--- adb starting (pid 3679) ---
+adb I  3679  3679 main.cpp:78] Android Debug Bridge version 1.0.36
+adb I  3679  3679 main.cpp:78] Revision af05c7354fe1-android
+adb I  3679  3679 main.cpp:78] 

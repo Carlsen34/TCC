@@ -68,7 +68,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "tcc-20190521225853-deployment",
-					"S3Key": "amplify-builds/routes-1558493402-latest-build.zip"
+					"S3Key": "amplify-builds/routes-1558651885-latest-build.zip"
 				}
 			}
 		},

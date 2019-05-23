@@ -1,0 +1,5 @@
+{
+    "tableName": "getRoute",
+    "partitionKeyName": "user",
+    "partitionKeyType": "S"
+}

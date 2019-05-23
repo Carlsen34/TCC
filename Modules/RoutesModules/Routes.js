@@ -12,7 +12,7 @@ import {
   KeyboardAvoidingView,
   StyleSheet
 } from 'react-native';
-
+import DialogInput from 'react-native-dialog-input';
 import MapView from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import getDirections from 'react-native-google-maps-directions'
@@ -29,14 +29,14 @@ const { height, width } = Dimensions.get('window');
 export default class MapScreen extends Component {
 
     state = {
-
+        isDialogVisible:false,
         origin: { latitude: 42.3616132, longitude: -71.0672576 },
         destination: { latitude: 42.3730591, longitude: -71.033754 },
         waypoints:'',
         originText: '',
         destinationText: '',
         waypointsText:'',
-        routeName:'',
+      
        
     
       };
@@ -104,45 +104,84 @@ export default class MapScreen extends Component {
 
 
 
+
       saveButton = () => {
-          var user = Auth.user.username;
-          var origin = this.state.originText
-          var destination = this.state.destinationText
-          var waypoints = "ASD" //this.state.waypointsText
-          var routeName = "TESTE" //this.state.routeName
+          this.setState({isDialogVisible:true})
+      }
 
-          let objRoutes = {
-            body: {
-              "routeName": routeName,
-              "user": user,
-              "origin":origin,
-              "destination": destination,
-              //"waypoints":waypoints
-              
-              
-            }
+      sendInput(inputText){
+        this.setState({isDialogVisible:false})
+
+        var user = Auth.user.username;
+        var origin = this.state.originText
+        var destination = this.state.destinationText
+        var waypoints = this.state.waypointsText
+        var routeName = inputText
+
+        let objRoutes = {
+          body: {
+            "routeName": routeName,
+            "user": user,
+            "origin":origin,
+            "destination": destination,
+            //"waypoints":waypoints
+            
+            
           }
+        }
+
+      
+        console.log(objRoutes);
+
+        const path = "/routes";
+      
+        // Use the API module to save the routes to the database
+        try {
+          const apiResponse =  API.put("Routes", path, objRoutes)
+          console.log("response from saving routes: " + apiResponse);
+          this.setState({apiResponse});
+          alert('Route saved successfully');
+          //return apiResponse;
+        } catch (e) {
+          console.log(e);
+        }
 
 
 
-        
-          console.log(objRoutes);
+      //   let objgetRoutes = {
+      //     body: {
+      //       "user": user,
+      //       "routes": routeName,
+           
+      //     }
+      //   }
 
-          const path = "/routes";
-        
-          // Use the API module to save the routes to the database
-          try {
-            const apiResponse =  API.put("Routes", path, objRoutes)
-            console.log("response from saving routes: " + apiResponse);
-            this.setState({apiResponse});
-            alert('Route saved successfully');
-            return apiResponse;
-          } catch (e) {
-            console.log(e);
-          }
+      //  objgetRoutes.body.routes.push(routeName);
+
+
+      //   console.log(objgetRoutes);
+
+      //    path = "/getRoute";
+      
+      //   // Use the API module to save the routes to the database
+      //   try {
+      //      apiResponse =  API.put("getRoute", path, objgetRoutes)
+      //     console.log("response from saving routes: " + apiResponse);
+      //     this.setState({apiResponse});
+      //     alert('Route saved successfully');
+      //     return apiResponse;
+      //   } catch (e) {
+      //     console.log(e);
+      //   }
       
 
+
+
       }
+
+
+      
+    
 
       handleButton = () => {
 
@@ -188,7 +227,9 @@ export default class MapScreen extends Component {
         }
 
       }
-    
+
+
+  
       handleGetGoogleMapDirections = () => {
     
         const data = {
@@ -256,7 +297,13 @@ export default class MapScreen extends Component {
     
             </MapView>
 
-          
+            <DialogInput isDialogVisible={this.state.isDialogVisible}
+            title={"Route Name"}
+            message={"Enter your route name"}
+            hintInput ={"Enter your route name"}
+            submitInput={ (inputText) => {this.sendInput(inputText)} }
+            closeDialog={ () => { this.setState({isDialogVisible:false})}}>
+          </DialogInput>
 
                 <TextInput
                     style={styles.input}
