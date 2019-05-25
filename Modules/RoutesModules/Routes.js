@@ -36,7 +36,8 @@ export default class MapScreen extends Component {
         originText: '',
         destinationText: '',
         waypointsText:'',
-      
+        RouteName:'',
+        hasRoute: false,
        
     
       };
@@ -110,10 +111,9 @@ export default class MapScreen extends Component {
       }
 
 
-      async saveRoutes(api,path,objRoutes){
-
+       async saveRoutes(api,path,objRoutes){
         try {
-          const apiResponse =  API.put(api, path, objRoutes)
+          const apiResponse = await API.put(api, path, objRoutes)
           console.log("response from saving routes: " + apiResponse);
           this.setState({apiResponse});
           return apiResponse;
@@ -123,18 +123,40 @@ export default class MapScreen extends Component {
 
       }
 
+      async getRoutes(user){
+        var path = "/getRoute/object/" + user;
+        try {
+          const apiResponse = await API.get("getRoute", path)
+          console.log("response from get routes: " + apiResponse.routeName);
+          this.setState({apiResponse});
+          if(apiResponse.routeName != undefined ){
+            this.setState({RouteName:apiResponse.routeName});
+            console.log(this.state.RouteName)
+            this.setState({hasRoute:true});
+            console.log("List Route: " + this.state.RouteName);
+          }else{
+            this.setState({hasRoute:false});
+
+          }
+          return apiResponse;
+        } catch (e) {
+          console.log(e);
+        }
+
+
+      }
       
 
-       sendInput(inputText){
-        this.setState({isDialogVisible:false})
+        async sendInput(inputText){
+        await this.setState({isDialogVisible:false})
 
-        var user = Auth.user.username;
-        var origin = this.state.originText
-        var destination = this.state.destinationText
-        var waypoints = this.state.waypointsText
-        var routeName = inputText
+        var user = await Auth.user.username;
+        var origin = await this.state.originText
+        var destination = await this.state.destinationText
+        var waypoints = await this.state.waypointsText
+        var routeName = await inputText
 
-         let objRoutes =  {
+         let objRoutes = await {
           body: {
             "routeName": routeName,
             "user": user,
@@ -145,16 +167,25 @@ export default class MapScreen extends Component {
             
           }
         }
-        this.saveRoutes("Routes","/routes",objRoutes);
+        await this.saveRoutes("Routes","/routes",objRoutes);
 
+        await this.getRoutes(user)
 
-        let objRoutesAux =  {
+        let objRoutesAux = await {
           body: {
             "user": user,
-            "routeName": routeName
+            "routeName": this.state.RouteName
           }
         }
-        this.saveRoutes("getRoute","/getRoute",objRoutesAux);
+
+        if( await this.state.hasRoute == true){
+          objRoutesAux.body.routeName.push(routeName);
+        }else{
+          objRoutesAux.body.routeName = [routeName];
+        }
+
+
+        await this.saveRoutes("getRoute","/getRoute",objRoutesAux);
         alert('Route saved successfully');
       };
 

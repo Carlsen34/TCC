@@ -21,10 +21,7 @@ export default class App extends React.Component {
     NewFriend:'',
     hasFriend:false,
     animating:true,
-    data: [
-      'Faculdade' ,
-      'cps-sp' ,
-    ],
+    routeNameList:''
   };
 
 
@@ -37,10 +34,11 @@ export default class App extends React.Component {
 
   async getRoutes(name) {
     console.log(name);
-    const path = "/getRoutes";
+    const path = "/getRoute/object/"+name;
     try {
-      const apiResponse = await API.get("Routes", path);
+      const apiResponse = await API.get("getRoute", path);
       console.log("response from getting route: " + apiResponse.routeName);
+      this.setState({routeNameList:apiResponse.routeName})
       this.setState({apiResponse});
 
  
@@ -57,6 +55,9 @@ export default class App extends React.Component {
     </View>
   );
  
+  componentWillMount(){
+    this.auxgetRoutes();
+   }
 
 render(){
  
@@ -69,7 +70,7 @@ render(){
             <FlatList
         style={{ marginTop: 30 }}
         contentContainerStyle={styles.list}
-        data={this.state.data}
+        data={this.state.routeNameList}
         renderItem={this.renderItem}
         keyExtractor={(item, index) => index.toString()}
       />
