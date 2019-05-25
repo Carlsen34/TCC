@@ -22,11 +22,8 @@ export default class App extends React.Component {
     hasFriend:false,
     animating:true,
     data: [
-      'Repo 1' ,
-      'Repo 2' ,
-      'Repo 3' ,
-      'Repo 4' ,
-      'Repo 5' ,
+      'Faculdade' ,
+      'cps-sp' ,
     ],
   };
 
@@ -40,10 +37,10 @@ export default class App extends React.Component {
 
   async getRoutes(name) {
     console.log(name);
-    const path = "/routes";
+    const path = "/getRoutes";
     try {
       const apiResponse = await API.get("Routes", path);
-      console.log("response from getting route: " + apiResponse.user);
+      console.log("response from getting route: " + apiResponse.routeName);
       this.setState({apiResponse});
 
  

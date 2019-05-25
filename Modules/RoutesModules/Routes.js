@@ -109,7 +109,23 @@ export default class MapScreen extends Component {
           this.setState({isDialogVisible:true})
       }
 
-      sendInput(inputText){
+
+      async saveRoutes(api,path,objRoutes){
+
+        try {
+          const apiResponse =  API.put(api, path, objRoutes)
+          console.log("response from saving routes: " + apiResponse);
+          this.setState({apiResponse});
+          return apiResponse;
+        } catch (e) {
+          console.log(e);
+        }
+
+      }
+
+      
+
+       sendInput(inputText){
         this.setState({isDialogVisible:false})
 
         var user = Auth.user.username;
@@ -118,7 +134,7 @@ export default class MapScreen extends Component {
         var waypoints = this.state.waypointsText
         var routeName = inputText
 
-        let objRoutes = {
+         let objRoutes =  {
           body: {
             "routeName": routeName,
             "user": user,
@@ -129,59 +145,18 @@ export default class MapScreen extends Component {
             
           }
         }
+        this.saveRoutes("Routes","/routes",objRoutes);
 
-      
-        console.log(objRoutes);
 
-        const path = "/routes";
-      
-        // Use the API module to save the routes to the database
-        try {
-          const apiResponse =  API.put("Routes", path, objRoutes)
-          console.log("response from saving routes: " + apiResponse);
-          this.setState({apiResponse});
-          alert('Route saved successfully');
-          //return apiResponse;
-        } catch (e) {
-          console.log(e);
+        let objRoutesAux =  {
+          body: {
+            "user": user,
+            "routeName": routeName
+          }
         }
-
-
-
-      //   let objgetRoutes = {
-      //     body: {
-      //       "user": user,
-      //       "routes": routeName,
-           
-      //     }
-      //   }
-
-      //  objgetRoutes.body.routes.push(routeName);
-
-
-      //   console.log(objgetRoutes);
-
-      //    path = "/getRoute";
-      
-      //   // Use the API module to save the routes to the database
-      //   try {
-      //      apiResponse =  API.put("getRoute", path, objgetRoutes)
-      //     console.log("response from saving routes: " + apiResponse);
-      //     this.setState({apiResponse});
-      //     alert('Route saved successfully');
-      //     return apiResponse;
-      //   } catch (e) {
-      //     console.log(e);
-      //   }
-      
-
-
-
-      }
-
-
-      
-    
+        this.saveRoutes("getRoute","/getRoute",objRoutesAux);
+        alert('Route saved successfully');
+      };
 
       handleButton = () => {
 

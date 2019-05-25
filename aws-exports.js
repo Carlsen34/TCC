@@ -10,32 +10,32 @@ const awsmobile = {
     "aws_dynamodb_all_tables_region": "us-east-1",
     "aws_dynamodb_table_schemas": [
         {
-            "tableName": "friendship-tcc",
+            "tableName": "friendship-projeto",
             "region": "us-east-1"
         },
         {
-            "tableName": "routes-tcc",
+            "tableName": "routes-projeto",
             "region": "us-east-1"
         },
         {
-            "tableName": "getRoute-tcc",
+            "tableName": "getRoute-projeto",
             "region": "us-east-1"
         }
     ],
     "aws_cloud_logic_custom": [
         {
             "name": "Friendship",
-            "endpoint": "https://ljp232czoj.execute-api.us-east-1.amazonaws.com/tcc",
+            "endpoint": "https://9u041beaob.execute-api.us-east-1.amazonaws.com/projeto",
             "region": "us-east-1"
         },
         {
             "name": "Routes",
-            "endpoint": "https://dwe2f7iko9.execute-api.us-east-1.amazonaws.com/tcc",
+            "endpoint": "https://0owaoyzukb.execute-api.us-east-1.amazonaws.com/projeto",
             "region": "us-east-1"
         },
         {
             "name": "getRoute",
-            "endpoint": "https://fdl7lwcb2m.execute-api.us-east-1.amazonaws.com/tcc",
+            "endpoint": "https://f8nnrb03q5.execute-api.us-east-1.amazonaws.com/projeto",
             "region": "us-east-1"
         }
     ]
