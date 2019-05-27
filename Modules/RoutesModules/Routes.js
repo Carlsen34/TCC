@@ -150,11 +150,11 @@ export default class MapScreen extends Component {
         async sendInput(inputText){
         await this.setState({isDialogVisible:false})
 
-        var user = await Auth.user.username;
-        var origin = await this.state.originText
-        var destination = await this.state.destinationText
-        var waypoints = await this.state.waypointsText
-        var routeName = await inputText
+        var user = Auth.user.username;
+        var origin = this.state.originText
+        var destination = this.state.destinationText
+        var waypoints = this.state.waypointsText
+        var routeName = inputText
 
          let objRoutes = await {
           body: {
