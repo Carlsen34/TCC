@@ -1,10 +1,16 @@
 import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator} from 'react-native';
+import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity} from 'react-native';
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
+import DialogInput from 'react-native-dialog-input';
+import MapView from 'react-native-maps';
+import MapViewDirections from 'react-native-maps-directions';
+import getDirections from 'react-native-google-maps-directions'
+import { PermissionsAndroid } from 'react-native';
+import Geocoder from 'react-native-geocoding';
 var AWS = require('aws-sdk');
 Amplify.configure(AWSConfig);
-
+const GOOGLE_MAPS_APIKEY = AWSConfig.GOOGLEAPI;
 Analytics.disable();
 
 
@@ -22,7 +28,13 @@ export default class App extends React.Component {
     hasFriend:false,
     animating:true,
     routeNameList:'',
-    routeName:''
+    routeName:'',
+    origin: '',
+    destination: '',
+    waypoints:'',
+    originText: 'Campinas',
+    destinationText: 'Sao Paulo',
+    waypointsText:'',
   };
 
 
@@ -101,11 +113,94 @@ export default class App extends React.Component {
     }
   }
 
+  geocoderAux = () => {
+
+    if(this.state.originText != '') {
+
+        Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
+
+        Geocoder.from(this.state.originText)
+            .then(json => {
+                var location = json.results[0].geometry.location;
+                console.log(location);
+                this.setState({ origin: { latitude: location.lat, longitude: location.lng } });
+
+        })
+        .catch(error => console.warn(error));
+
+    }
+
+    else {
+
+        alert("Digite a origem ! ")
+
+    }
+
+    if(this.state.destinationText != '') {
+
+        Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
+
+        Geocoder.from(this.state.destinationText)
+        .then(json => {
+            var location = json.results[0].geometry.location;
+            console.log(location);
+            this.setState({ destination: { latitude: location.lat, longitude: location.lng } });
+
+        })
+        .catch(error => console.warn(error));
+    }
+
+    else {
+
+        alert("Digite o destino ! ")
+
+    }
+
+  }
+
+  handleGetGoogleMapDirections = () => {
+    
+    const data = {
+
+        source: this.state.origin,
+        destination: this.state.destination,
+        params: [
+            {
+              key: "travelmode",
+              value: "driving"
+            }
+        ]
+        
+    };
+
+    getDirections(data)
+
+  };
+
+
+   openRoute =  async (item) => {
+
+    try {
+      const apiResponse =  await API.get("Routes", "/routes/object/" + "Joao Rock");
+      await  this.setState({originText:apiResponse.origin})
+      await  this.setState({destinationText:apiResponse.destination})
+      this.setState({apiResponse});
+    } catch (e) {
+      console.log(e);
+      return 
+    }
+  
+   await  this.geocoderAux()
+   await this.handleGetGoogleMapDirections()
+}
 
   renderItem = ({ item }) => (
+    
+    <TouchableOpacity onPress={this.openRoute.bind(item)}>
     <View style={styles.listItem}>
       <Text>{item}</Text>
     </View>
+    </TouchableOpacity>
   );
  
   componentWillMount(){
