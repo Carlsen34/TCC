@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity} from 'react-native';
+import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity,TouchableHighlight} from 'react-native';
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
 import DialogInput from 'react-native-dialog-input';
@@ -22,10 +22,6 @@ export default class App extends React.Component {
 
   state = {
     apiResponse: null,
-    Users: '',
-    Friends:'',
-    NewFriend:'',
-    hasFriend:false,
     animating:true,
     routeNameList:'',
     routeName:'',
@@ -114,6 +110,7 @@ export default class App extends React.Component {
   }
 
   geocoderAux = () => {
+  
 
     if(this.state.originText != '') {
 
@@ -133,6 +130,7 @@ export default class App extends React.Component {
     else {
 
         alert("Digite a origem ! ")
+        
 
     }
 
@@ -145,7 +143,7 @@ export default class App extends React.Component {
             var location = json.results[0].geometry.location;
             console.log(location);
             this.setState({ destination: { latitude: location.lat, longitude: location.lng } });
-
+            this.handleGetGoogleMapDirections()
         })
         .catch(error => console.warn(error));
     }
@@ -153,7 +151,7 @@ export default class App extends React.Component {
     else {
 
         alert("Digite o destino ! ")
-
+  
     }
 
   }
@@ -172,16 +170,22 @@ export default class App extends React.Component {
         ]
         
     };
+ 
+     getDirections(data);
 
-    getDirections(data)
+ 
 
   };
 
 
    openRoute =  async (item) => {
 
+    console.log(item);
+    
+
+
     try {
-      const apiResponse =  await API.get("Routes", "/routes/object/" + "Joao Rock");
+      const apiResponse =  await API.get("Routes", "/routes/object/" + item);
       await  this.setState({originText:apiResponse.origin})
       await  this.setState({destinationText:apiResponse.destination})
       this.setState({apiResponse});
@@ -190,18 +194,13 @@ export default class App extends React.Component {
       return 
     }
   
-   await  this.geocoderAux()
-   await this.handleGetGoogleMapDirections()
-}
+      await  this.geocoderAux()    
+  }
 
-  renderItem = ({ item }) => (
-    
-    <TouchableOpacity onPress={this.openRoute.bind(item)}>
-    <View style={styles.listItem}>
-      <Text>{item}</Text>
-    </View>
-    </TouchableOpacity>
-  );
+
+
+
+
  
   componentWillMount(){
     this.auxgetRoutes();
@@ -211,60 +210,71 @@ export default class App extends React.Component {
     this.setState({routeName: event});
 }
 
+
+actionOnRow(item){
+  console.log(item)
+}
+
 render(){
 
-    return(
-      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-     <Button 
-      title="List Routes"
-       onPress={this.auxgetRoutes.bind(this)}  
-       /> 
-      <Text></Text>
-     <Button 
-      title="Delete Routes"
-       onPress={this.auxdeleteRoutes.bind(this)} /> 
-        <FlatList
-        style={{ marginTop: 30 }}
-        contentContainerStyle={styles.list}
-        data={this.state.routeNameList}
-        renderItem={this.renderItem}
-        keyExtractor={(item, index) => index.toString()}
-      />
-       <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
-    
+  return(
+    <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+   <Button 
+    title="List Routes"
+     onPress={this.auxgetRoutes.bind(this)}  
+     /> 
+    <Text></Text>
+   <Button 
+    title="Delete Routes"
+     onPress={this.auxdeleteRoutes.bind(this)} /> 
+      <FlatList
+      style={{ marginTop: 30 }}
+      contentContainerStyle={styles.list}
+      data={this.state.routeNameList}
+      renderItem = {({item}) =>
+      <View style={styles.listItem}>
+        <TouchableOpacity onPress={() =>this.openRoute(item)}>
+      <Text>{item}</Text>
+        </TouchableOpacity>
+    </View>
+    }
+      keyExtractor={(item, index) => index.toString()}
+    />
+     <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
+  
 </KeyboardAvoidingView>
-    )
-  }
+  )
+}
 }
 
 
 const styles = StyleSheet.create({
-  container: {
-    margin: 30,
-    flex: 5,
-    backgroundColor: '#fff',
-    padding: 16,
+container: {
+  margin: 30,
+  flex: 5,
+  backgroundColor: '#fff',
+  padding: 16,
 
-  },
-  textInput: {
-      margin: 15,
-      height: 30,
-      width: 200,
-      borderWidth: 1,
-      fontSize: 20,
-   },  list: {
-    paddingHorizontal: 20,
-  },  
-  listItem: {
-    backgroundColor: '#EEE',
-    marginTop: 20,
-    padding: 30,
-  },
-  input: {
-    height: 50,
-    borderBottomWidth: 2,
-    borderBottomColor: '#2196F3',
-    margin: 10,
-  }
-   
+},
+textInput: {
+    margin: 15,
+    height: 30,
+    width: 200,
+    borderWidth: 1,
+    fontSize: 20,
+ },  list: {
+  paddingHorizontal: 20,
+},  
+listItem: {
+  backgroundColor: '#EEE',
+  marginTop: 20,
+  padding: 30,
+},
+input: {
+  height: 50,
+  borderBottomWidth: 2,
+  borderBottomColor: '#2196F3',
+  margin: 10,
+}
+ 
 });
