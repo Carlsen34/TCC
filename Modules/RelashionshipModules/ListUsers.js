@@ -1,7 +1,8 @@
 import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator} from 'react-native';
+import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity} from 'react-native';
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
+
 var AWS = require('aws-sdk');
 Amplify.configure(AWSConfig);
 
@@ -21,7 +22,8 @@ const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
   AttributesToGet:[],
  }
 
-export default class App extends React.Component {
+export default class ListUsers extends React.Component {
+  
 
   state = {
     apiResponse: null,
@@ -193,12 +195,6 @@ async  deleteUser(user,newFriends) {
  }
 
 
- renderItem = ({ item }) => (
-  <View style={styles.listItem}>
-    <Text>{item}</Text>
-  </View>
-);
-
 
 componentWillMount(){
    this.auxgetUser();
@@ -236,13 +232,24 @@ render(){
       <Button 
       title="Delete Friend"
        onPress={this.auxDeleteUser.bind(this)}  
-       />    
+       /> 
 
       <FlatList
         style={{ marginTop: 15 }}
         contentContainerStyle={styles.list}
         data={this.state.Friends}
-        renderItem={this.renderItem}
+        renderItem = {({item}) =>
+        <View style={styles.listItem}>
+          <TouchableOpacity  onPress={() => {
+            this.props.navigation.navigate('UserProfile', {
+              itemId: 86,
+              name: item,
+          })
+          }}>
+        <Text>{item}</Text>
+          </TouchableOpacity>
+      </View>
+      }
         keyExtractor={(item, index) => index.toString()}
       />
 
