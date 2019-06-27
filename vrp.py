@@ -15,7 +15,7 @@ app = Flask(__name__)
 def create_data(addresses):
   """Creates the data."""
   data = {}
-  data['API_key'] = 'AIzaSyBNWlA0LdrEMFEww_o6_tWGltDG2kS5I_Y'
+  data['API_key'] = 'API-KEY'
   data['addresses'] = addresses.split('|')
   return data
 
