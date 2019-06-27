@@ -12,11 +12,15 @@ import os
 #EXEMPLE URL http://127.0.0.1:5000/api/v1/vrp/route=campinas|sao+paulo|rio+janeiro/2
 app = Flask(__name__)
 
+Addresses = {}
+
 def create_data(addresses):
   """Creates the data."""
   data = {}
-  data['API_key'] = 'API-KEY'
+  data['API_key'] = 'YOUR-API-KEY'
   data['addresses'] = addresses.split('|')
+  global Addresses
+  Addresses['addresses'] = data['addresses']
   return data
 
 def create_distance_matrix(data):
@@ -84,32 +88,48 @@ def print_solution(data, manager, routing, solution):
     """Prints solution on console."""
     response = ''
     max_route_distance = 0
+    global Addresses
+     
     for vehicle_id in range(data['num_vehicles']):
+        res = {}
         index = routing.Start(vehicle_id)
-        plan_output = 'Route_for_vehicle {}:'.format(vehicle_id)
+        plan_output = ''
+        res['Vehicle'] = vehicle_id
         route_distance = 0
         while not routing.IsEnd(index):
-            plan_output += '{},'.format(manager.IndexToNode(index))
+            plan_output += Addresses['addresses'][manager.IndexToNode(index)] + '|'
             previous_index = index
             index = solution.Value(routing.NextVar(index))
             route_distance += routing.GetArcCostForVehicle(
                 previous_index, index, vehicle_id)
-        plan_output += '{}\n'.format(manager.IndexToNode(index))
+               
+        plan_output +=  Addresses['addresses'][manager.IndexToNode(index)]
+        res['Route'] = plan_output.replace('+',' ')
         plan_output += 'Distance_of_the_route":"{}m\n'.format(route_distance)
-        response += plan_output
+        res['Distance_of_the_route'] = route_distance
+        res = json.dumps(res)
+        response += res
         max_route_distance = max(route_distance, max_route_distance)
-    print('Maximum_of_the_route_distances:{}m'.format(max_route_distance))
-    return response
+    res = {}
+    res['Maximum_of_the_route_distances'] = max_route_distance
+    res = json.dumps(res)
+    response += res
+    response1 = app.response_class(
+        response=json.dumps(response),
+        status=200,
+        mimetype='application/json'
+    )
+
+    return  response1
+
 
 @app.route('/api/v1/vrp/route=<addresses>/<int:num_vehicles>', methods=['GET'])
 def vrp(addresses=None,num_vehicles=None):
-    print(addresses)
     # Create the data.
     data = create_data(addresses)
     addresses = data['addresses']
     API_key = data['API_key']
     distance_matrix = create_distance_matrix(data)
-    print(distance_matrix)
     """Solve the CVRP problem."""
     # Instantiate the data problem.
     data = create_data_model(distance_matrix,num_vehicles)
