@@ -10,14 +10,14 @@ from bs4 import BeautifulSoup
 import urllib.request 
 import os
 #EXEMPLE URL http://127.0.0.1:5000/api/v1/vrp/route=campinas|sao+paulo|rio+janeiro/2
-app = Flask(__name__)
+application = Flask(__name__)
 
 Addresses = {}
 
 def create_data(addresses):
   """Creates the data."""
   data = {}
-  data['API_key'] = 'YOUR-API-KEY'
+  data['API_key'] = 'API-KEY'
   data['addresses'] = addresses.split('|')
   global Addresses
   Addresses['addresses'] = data['addresses']
@@ -86,45 +86,48 @@ def create_data_model(matrix,number):
 
 def print_solution(data, manager, routing, solution):
     """Prints solution on console."""
-    response = ''
-    max_route_distance = 0
     global Addresses
-     
+
+    Vehicle = []
+    Route = []
+    DistRoute = []
+    max_route_distance = 0
     for vehicle_id in range(data['num_vehicles']):
-        res = {}
+        ListAux = []
+        Vehicle.append(vehicle_id)        
         index = routing.Start(vehicle_id)
-        plan_output = ''
-        res['Vehicle'] = vehicle_id
+        
         route_distance = 0
         while not routing.IsEnd(index):
-            plan_output += Addresses['addresses'][manager.IndexToNode(index)] + '|'
+            ListAux.append(Addresses['addresses'][manager.IndexToNode(index)])
+            
             previous_index = index
             index = solution.Value(routing.NextVar(index))
             route_distance += routing.GetArcCostForVehicle(
                 previous_index, index, vehicle_id)
-               
-        plan_output +=  Addresses['addresses'][manager.IndexToNode(index)]
-        res['Route'] = plan_output.replace('+',' ')
-        plan_output += 'Distance_of_the_route":"{}m\n'.format(route_distance)
-        res['Distance_of_the_route'] = route_distance
-        res = json.dumps(res)
-        response += res
+        ListAux.append(Addresses['addresses'][manager.IndexToNode(index)])
+        Route.append(ListAux) 
+        DistRoute.append(route_distance)
         max_route_distance = max(route_distance, max_route_distance)
-    res = {}
-    res['Maximum_of_the_route_distances'] = max_route_distance
-    res = json.dumps(res)
-    response += res
-    response1 = app.response_class(
-        response=json.dumps(response),
-        status=200,
-        mimetype='application/json'
-    )
-
-    return  response1
+  
 
 
-@app.route('/api/v1/vrp/route=<addresses>/<int:num_vehicles>', methods=['GET'])
-def vrp(addresses=None,num_vehicles=None):
+    return jsonify(
+        Vehicle=Vehicle,
+        Maximum_of_the_route_distances = max_route_distance,
+        Route=Route,
+        Distance_of_the_route = DistRoute
+        )
+
+
+
+@application.route('/', methods=['GET'])
+def wrongAccess():
+   return "null"
+
+
+@application.route('/api/v1/vrp/route=<addresses>/<int:num_vehicles>', methods=['GET'])
+def vrp(addresses=None,num_vehicles=None):  
     # Create the data.
     data = create_data(addresses)
     addresses = data['addresses']
@@ -180,7 +183,6 @@ def vrp(addresses=None,num_vehicles=None):
     if solution:
         response = print_solution(data, manager, routing, solution)
         return response
-
 if __name__ == '__main__':
-  port = int(os.environ.get('PORT', 5000))
-  app.run(host='127.0.0.1', port=port)
+  application.run(host='0.0.0.0')
+
