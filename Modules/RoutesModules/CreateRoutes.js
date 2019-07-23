@@ -75,7 +75,6 @@ addVehicle = (item) => {
 
 
 completeRoute = (fullAPI) => {
-  alert(fullAPI)
   const {vehicles} = this.state;
   fetch(fullAPI).then(response => response.json()).then(data => {
   this.props.navigation.navigate('ConclusionScreen', {

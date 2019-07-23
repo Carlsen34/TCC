@@ -3,7 +3,8 @@ import { Platform } from 'react-native';
 import { createAppContainer, createBottomTabNavigator } from 'react-navigation';
 
 import Relationship from './RelashionshipModules/ListUserRoutes';
-import CreateRoutes from './RoutesModules/CreateRoutes';
+import VRP from './RoutesModules/CreateRoutes';
+import SMP from './RoutesModules/Routes';
 import LoadRoutes from './RoutesModules/LoadRoutes';
 
 const createApp = Platform.select({
@@ -14,7 +15,8 @@ export default createApp(
   createBottomTabNavigator(
     {
       Relationship,
-      CreateRoutes,
+      VRP,
+      SMP,
       LoadRoutes,
     },
     {
