@@ -3,7 +3,7 @@ import {StyleSheet,View, Text, Button,TextInput,KeyboardAvoidingView,FlatList,To
 import { createAppContainer, createStackNavigator, StackActions, NavigationActions } from 'react-navigation'; 
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 
-const routeAPI = 'http://vrp-dev.us-west-2.elasticbeanstalk.com/api/v1/vrp/route='
+const routeAPI = 'http://vrp-dev.us-east-1.elasticbeanstalk.com/api/v1/vrp/route=';
 
 class AddressScreen extends React.Component {
 

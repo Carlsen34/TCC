@@ -1,6 +1,8 @@
 import React from 'react';
 import { TextInput, Button, StyleSheet,KeyboardAvoidingView } from 'react-native';
-import Amplify,{ Auth } from 'aws-amplify';
+import Amplify, { Auth } from 'aws-amplify';
+import awsconfig from '../../aws-exports';
+Amplify.configure(awsconfig);
 
 
 export default class App extends React.Component {

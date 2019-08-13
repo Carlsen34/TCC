@@ -104,5 +104,11 @@
 			]
 		}
 	},
-	"auth": {}
+	"auth": {
+		"tccfb948874": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": []
+		}
+	}
 }

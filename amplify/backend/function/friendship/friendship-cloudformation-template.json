@@ -67,8 +67,8 @@
 				"Runtime": "nodejs8.10",
 				"Timeout": "25",
 				"Code": {
-					"S3Bucket": "tcc-20190524122729-deployment",
-					"S3Key": "amplify-builds/friendship-1558711900-latest-build.zip"
+					"S3Bucket": "tcc-projecttcc-20190812170507-deployment",
+					"S3Key": "amplify-builds/friendship-2f364b47366d43667267-build.zip"
 				}
 			}
 		},

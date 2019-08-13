@@ -67,8 +67,8 @@
 				"Runtime": "nodejs8.10",
 				"Timeout": "25",
 				"Code": {
-					"S3Bucket": "tcc-20190524122729-deployment",
-					"S3Key": "amplify-builds/getRoute-1558711902-latest-build.zip"
+					"S3Bucket": "tcc-projecttcc-20190812170507-deployment",
+					"S3Key": "amplify-builds/getRoute-6838662f4f6b6a5a486a-build.zip"
 				}
 			}
 		},
