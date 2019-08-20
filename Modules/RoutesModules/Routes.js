@@ -32,12 +32,13 @@ export default class MapScreen extends Component {
         isDialogVisible:false,
         origin: { latitude: 42.3616132, longitude: -71.0672576 },
         destination: { latitude: 42.3730591, longitude: -71.033754 },
-        waypoints:'',
+        waypoints:{ latitude: 0, longitude: 0 },
         originText: '',
         destinationText: '',
         waypointsText:'',
         RouteName:'',
         hasRoute: false,
+        arrWaypoints:[],
        
     
       };
@@ -162,7 +163,7 @@ export default class MapScreen extends Component {
             "user": user,
             "origin":origin,
             "destination": destination,
-            //"waypoints":waypoints
+            "waypoints":waypoints
             
             
           }
@@ -204,6 +205,17 @@ export default class MapScreen extends Component {
             })
             .catch(error => console.warn(error));
 
+            Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
+            Geocoder.from(this.state.waypointsText)
+            .then(json => {
+                var location = json.results[0].geometry.location;
+                console.log(location);
+                this.setState({ waypoints: { latitude: location.lat, longitude: location.lng } });
+                this.setState({arrWaypoints:arrWaypoints.push(this.state.waypoints)});
+
+        })
+        .catch(error => console.warn(error));
+
         }
 
         else {
@@ -242,6 +254,7 @@ export default class MapScreen extends Component {
     
             source: this.state.origin,
             destination: this.state.destination,
+            waypoints: this.state.waypoints,
             params: [
                 {
                   key: "travelmode",
@@ -288,6 +301,11 @@ export default class MapScreen extends Component {
             </MapView.Marker>
 
             <MapView.Marker
+              coordinate={this.state.waypoints}
+            >
+            </MapView.Marker>
+
+            <MapView.Marker
               coordinate={this.state.origin}
             >
             <MapView.Callout>
@@ -297,6 +315,7 @@ export default class MapScreen extends Component {
 
             <MapViewDirections
               origin={this.state.origin}
+              waypoints={this.state.arrWaypoints}
               destination={this.state.destination}
               apikey={GOOGLE_MAPS_APIKEY}
             />
@@ -316,6 +335,13 @@ export default class MapScreen extends Component {
                     onChangeText={(text) => this.setState({ originText: text })}
                     placeholder='Origin'
                     value={this.state.originText}
+                />
+
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={(text) => this.setState({ waypointsText: text })}
+                    placeholder='Waypoints'
+                    value={this.state.waypointsText}
                 />
 
                  <TextInput
