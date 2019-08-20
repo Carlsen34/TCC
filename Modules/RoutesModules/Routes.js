@@ -21,6 +21,8 @@ import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import Geocoder from 'react-native-geocoding';
 
 const GOOGLE_MAPS_APIKEY = AWSConfig.GOOGLEAPI;
+const routeAPI = 'http://vrp-dev.us-east-1.elasticbeanstalk.com/api/v1/vrp/route=';
+const arr = [];
 
 const backgroundColor = '#007256';
 
@@ -42,6 +44,15 @@ export default class MapScreen extends Component {
        
     
       };
+
+
+      // onChangeText(key, value) {
+      //   var str = value.split(" ")
+      //   console.log(str)
+      //   this.setState({
+      //     [key]: str,
+      //   });
+      // }
     
       async requestLocationPermission() {
         try {
@@ -191,6 +202,15 @@ export default class MapScreen extends Component {
       };
 
       handleButton = () => {
+        const fullAPI = routeAPI + "Campinas|Rio+Janeiro|Sao+Paulo" + '/' + 1;
+        fetch(fullAPI).then(response => response.json()).then(data => {
+        data.Route[0].forEach(function (item, indice, array) {
+          var str = item.replace("+"," ")
+          console.log(str)
+        })
+
+        })
+
 
         if(this.state.originText != '') {
 
@@ -211,7 +231,8 @@ export default class MapScreen extends Component {
                 var location = json.results[0].geometry.location;
                 console.log(location);
                 this.setState({ waypoints: { latitude: location.lat, longitude: location.lng } });
-                this.setState({arrWaypoints:arrWaypoints.push(this.state.waypoints)});
+                arr.push(this.state.waypoints);
+                this.setState({arrWaypoints:arr});
 
         })
         .catch(error => console.warn(error));
@@ -254,7 +275,7 @@ export default class MapScreen extends Component {
     
             source: this.state.origin,
             destination: this.state.destination,
-            waypoints: this.state.waypoints,
+            waypoints: this.state.arrWaypoints,
             params: [
                 {
                   key: "travelmode",
@@ -269,7 +290,6 @@ export default class MapScreen extends Component {
       };
 
     render() {
-
         return(
 
             <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
@@ -337,12 +357,11 @@ export default class MapScreen extends Component {
                     value={this.state.originText}
                 />
 
-                  <TextInput
-                    style={styles.input}
-                    onChangeText={(text) => this.setState({ waypointsText: text })}
-                    placeholder='Waypoints'
-                    value={this.state.waypointsText}
-                />
+                {/* <TextInput
+                  onChangeText={text => this.onChangeText('waypointsText', text+'|')}
+                  style={styles.input}
+                  placeholder="Waypoints"
+              /> */}
 
                  <TextInput
                     style={styles.input}
