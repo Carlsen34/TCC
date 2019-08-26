@@ -157,6 +157,7 @@ export default class MapScreen extends Component {
 
 
       }
+
       
 
         async sendInput(inputText){
@@ -201,75 +202,69 @@ export default class MapScreen extends Component {
         alert('Route saved successfully');
       };
 
-      handleButton = () => {
+    handleButton = () => {
         const fullAPI = routeAPI + "Campinas|Rio+Janeiro|Sao+Paulo" + '/' + 1;
         fetch(fullAPI).then(response => response.json()).then(data => {
+        var arrayAux = []
         data.Route[0].forEach(function (item, indice, array) {
-          var str = item.replace("+"," ")
-          console.log(str)
+         var str = item.replace("+"," ")
+         arrayAux.push(str)
+ 
         })
-
+        this.handleArray(arrayAux)
         })
-
-
-        if(this.state.originText != '') {
-
-            Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
-
-            Geocoder.from(this.state.originText)
-                .then(json => {
-                    var location = json.results[0].geometry.location;
-                    console.log(location);
-                    this.setState({ origin: { latitude: location.lat, longitude: location.lng } });
-
-            })
-            .catch(error => console.warn(error));
-
-            Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
-            Geocoder.from(this.state.waypointsText)
-            .then(json => {
-                var location = json.results[0].geometry.location;
-                console.log(location);
-                this.setState({ waypoints: { latitude: location.lat, longitude: location.lng } });
-                arr.push(this.state.waypoints);
-                this.setState({arrWaypoints:arr});
-
-        })
-        .catch(error => console.warn(error));
-
-        }
-
-        else {
-
-            alert("Digite a origem ! ")
-
-        }
-
-        if(this.state.destinationText != '') {
-
-            Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
-
-            Geocoder.from(this.state.destinationText)
-            .then(json => {
-                var location = json.results[0].geometry.location;
-                console.log(location);
-                this.setState({ destination: { latitude: location.lat, longitude: location.lng } });
-
-            })
-            .catch(error => console.warn(error));
-        }
-
-        else {
-
-            alert("Digite o destino ! ")
-
-        }
-
       }
 
 
+
+async handleArray(params) {
+    let auxArray = []
+    await Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
+    await Geocoder.from(params.shift())
+        .then(json => {
+            var location = json.results[0].geometry.location;
+            console.log(location);
+            this.setState({ origin: { latitude: location.lat, longitude: location.lng } });
+
+    })
+    .catch(error => console.warn(error));
+
+
+
+    await Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
+    await Geocoder.from(params.pop())
+    .then(json => {
+        var location = json.results[0].geometry.location;
+        console.log(location);
+        this.setState({ destination: { latitude: location.lat, longitude: location.lng } });
+
+    })
+    .catch(error => console.warn(error));
+
+
+
+
+  var i;
+  for (i = 0; i < params.length; i++) {
+      console.log(params[i]) 
+      await Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
+      await Geocoder.from(params[i])
+      .then(json => {
+          var location = json.results[0].geometry.location;
+          console.log(location);
+          this.setState({ waypoints: { latitude: location.lat, longitude: location.lng } });
+          arr.push(this.state.waypoints);
+
+  })
+  .catch(error => console.warn(error)); 
+}
+
+await this.setState({arrWaypoints:arr});
+await console.log(this.state.arrWaypoints)
+}
+
   
-      handleGetGoogleMapDirections = () => {
+handleGetGoogleMapDirections = () => {
     
         const data = {
     
@@ -319,11 +314,11 @@ export default class MapScreen extends Component {
                 <Text>Press to Get Direction</Text>
               </MapView.Callout>
             </MapView.Marker>
-
+{/* 
             <MapView.Marker
               coordinate={this.state.waypoints}
             >
-            </MapView.Marker>
+            </MapView.Marker> */}
 
             <MapView.Marker
               coordinate={this.state.origin}
@@ -450,3 +445,4 @@ const styles = StyleSheet.create({
       },
 
 });
+
