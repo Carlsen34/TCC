@@ -46,13 +46,13 @@ export default class MapScreen extends Component {
       };
 
 
-      // onChangeText(key, value) {
-      //   var str = value.split(" ")
-      //   console.log(str)
-      //   this.setState({
-      //     [key]: str,
-      //   });
-      // }
+      onChangeText(key, value) {
+        var str = value.split(" ")
+        console.log(str)
+        this.setState({
+          [key]: str,
+        });
+      }
     
       async requestLocationPermission() {
         try {
@@ -203,7 +203,8 @@ export default class MapScreen extends Component {
       };
 
     handleButton = () => {
-        const fullAPI = routeAPI + "Campinas|Rio+Janeiro|Sao+Paulo" + '/' + 1;
+       // const fullAPI = routeAPI +this.state.originText+"|" +this.state.waypointsText + '/' + 1;
+        const fullAPI = routeAPI + "campinas|sao+paulo|jaguariuna|rio+janeiro"+'/'+1
         fetch(fullAPI).then(response => response.json()).then(data => {
         var arrayAux = []
         data.Route[0].forEach(function (item, indice, array) {
@@ -220,7 +221,8 @@ export default class MapScreen extends Component {
 async handleArray(params) {
     let auxArray = []
     await Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
-    await Geocoder.from(params.shift())
+    await this.setState({originText: params.shift()})
+    await Geocoder.from(this.state.originText)
         .then(json => {
             var location = json.results[0].geometry.location;
             console.log(location);
@@ -232,7 +234,8 @@ async handleArray(params) {
 
 
     await Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
-    await Geocoder.from(params.pop())
+    await this.setState({destinationText: params.pop()})
+    await Geocoder.from(this.state.destinationText)
     .then(json => {
         var location = json.results[0].geometry.location;
         console.log(location);
@@ -245,6 +248,7 @@ async handleArray(params) {
 
 
   var i;
+  var listAux = []
   for (i = 0; i < params.length; i++) {
       console.log(params[i]) 
       await Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
@@ -257,6 +261,9 @@ async handleArray(params) {
 
   })
   .catch(error => console.warn(error)); 
+  await listAux.push(params[i])
+  await this.setState({waypointsText:listAux})
+  await console.log(this.state.waypointsText)
 }
 
 await this.setState({arrWaypoints:arr});
@@ -352,18 +359,18 @@ handleGetGoogleMapDirections = () => {
                     value={this.state.originText}
                 />
 
-                {/* <TextInput
+                <TextInput
                   onChangeText={text => this.onChangeText('waypointsText', text+'|')}
                   style={styles.input}
                   placeholder="Waypoints"
-              /> */}
+              />
 
-                 <TextInput
+                 {/* <TextInput
                     style={styles.input}
                     onChangeText={(text) => this.setState({ destinationText: text })}
                     placeholder='Destination'
                     value={this.state.destinationText}
-                />
+                /> */}
 
                 <TouchableOpacity style={styles.button} onPress={this.handleButton}>
 

@@ -11,6 +11,7 @@ import Geocoder from 'react-native-geocoding';
 var AWS = require('aws-sdk');
 Amplify.configure(AWSConfig);
 const GOOGLE_MAPS_APIKEY = AWSConfig.GOOGLEAPI;
+const arr = [];
 Analytics.disable();
 
 
@@ -31,6 +32,8 @@ export default class App extends React.Component {
     originText: 'Campinas',
     destinationText: 'Sao Paulo',
     waypointsText:'',
+    arrWaypoints:[]
+
   };
 
 
@@ -134,6 +137,9 @@ export default class App extends React.Component {
 
     }
 
+
+    
+
     if(this.state.destinationText != '') {
 
         Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
@@ -154,6 +160,23 @@ export default class App extends React.Component {
   
     }
 
+
+
+    var i;
+    for (i = 0; i < this.state.waypointsText.length; i++) {
+         Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
+         Geocoder.from(this.state.waypointsText[i])
+        .then(json => {
+            var location = json.results[0].geometry.location;
+            console.log(location);
+            this.setState({ waypoints: { latitude: location.lat, longitude: location.lng } });
+            arr.push(this.state.waypoints);
+  
+    })
+    .catch(error => console.warn(error)); 
+
+  }
+  this.setState({arrWaypoints:arr});
   }
 
   handleGetGoogleMapDirections = () => {
@@ -162,6 +185,7 @@ export default class App extends React.Component {
 
         source: this.state.origin,
         destination: this.state.destination,
+        waypoints: this.state.arrWaypoints,
         params: [
             {
               key: "travelmode",
@@ -188,12 +212,14 @@ export default class App extends React.Component {
       const apiResponse =  await API.get("Routes", "/routes/object/" + item);
       await  this.setState({originText:apiResponse.origin})
       await  this.setState({destinationText:apiResponse.destination})
+      await  this.setState({waypointsText:apiResponse.waypoints})
+
       this.setState({apiResponse});
     } catch (e) {
       console.log(e);
       return 
     }
-  
+     
       await  this.geocoderAux()    
   }
 

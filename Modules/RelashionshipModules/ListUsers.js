@@ -178,6 +178,8 @@ async  deleteUser(user,newFriends) {
           // Use the API module to save the note to the database
           try {
             const apiResponse =  API.put("Friendship", path, objNewFriend)
+            console.log(path)
+            console.log(objNewFriend)
             console.log("response from saving note: " + apiResponse);
             this.setState({apiResponse});
             return apiResponse;
