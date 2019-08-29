@@ -56,6 +56,7 @@ export default class UserProfile extends React.Component {
             const apiResponse =  await API.get("Routes", "/routes/object/" + item);
             await  this.setState({originText:apiResponse.origin})
             await  this.setState({destinationText:apiResponse.destination})
+            await  this.setState({waypointsText:apiResponse.waypoints})
             this.setState({apiResponse});
           } catch (e) {
             console.log(e);
@@ -80,7 +81,7 @@ export default class UserProfile extends React.Component {
             "user": user,
             "origin":origin,
             "destination": destination,
-            //"waypoints":waypoints
+            "waypoints":waypoints
             
             
           }
