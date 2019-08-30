@@ -47,10 +47,8 @@ export default class MapScreen extends Component {
 
 
       onChangeText(key, value) {
-        var str = value.split(" ")
-        console.log(str)
         this.setState({
-          [key]: str,
+          [key]: value,
         });
       }
     
@@ -204,7 +202,7 @@ export default class MapScreen extends Component {
 
     handleButton = () => {
        // const fullAPI = routeAPI +this.state.originText+"|" +this.state.waypointsText + '/' + 1;
-        const fullAPI = routeAPI + "campinas|sao+paulo|jaguariuna|rio+janeiro"+'/'+1
+        const fullAPI = routeAPI + this.state.originText + this.state.waypointsText.split(" ").join("+") +'/'+1
         fetch(fullAPI).then(response => response.json()).then(data => {
         var arrayAux = []
         data.Route[0].forEach(function (item, indice, array) {
@@ -352,25 +350,16 @@ handleGetGoogleMapDirections = () => {
             closeDialog={ () => { this.setState({isDialogVisible:false})}}>
           </DialogInput>
 
-                <TextInput
-                    style={styles.input}
-                    onChangeText={(text) => this.setState({ originText: text })}
-                    placeholder='Origin'
-                    value={this.state.originText}
-                />
-
+              <TextInput
+                  onChangeText={text => this.onChangeText('originText', text+'|')}
+                  style={styles.input}
+                  placeholder="Origin"
+              />
                 <TextInput
                   onChangeText={text => this.onChangeText('waypointsText', text+'|')}
                   style={styles.input}
                   placeholder="Waypoints"
-              />
-
-                 {/* <TextInput
-                    style={styles.input}
-                    onChangeText={(text) => this.setState({ destinationText: text })}
-                    placeholder='Destination'
-                    value={this.state.destinationText}
-                /> */}
+                  />
 
                 <TouchableOpacity style={styles.button} onPress={this.handleButton}>
 
