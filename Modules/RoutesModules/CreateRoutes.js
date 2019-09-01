@@ -157,8 +157,26 @@ class ConclusionScreen extends React.Component {
 
     state = {
     data: [],
-    vehicles: []
+    vehicles: [],
+    index_vehicles:[],
+    dist:[],
+    max_dist:[],
+    route:[]
   };
+
+  handleButton = (vehicles,index_vehicles,dist,max_dist,route) => {
+    // console.log(vehicles)
+    // console.log(index_vehicles)
+    // console.log(dist)
+    // console.log(max_dist)
+    // console.log(route)
+
+    index_vehicles.forEach(function(value){
+      console.log(vehicles[value])
+      console.log(route[value])
+    })
+
+   }
 
  render() {
     const { navigation } = this.props;
@@ -175,6 +193,9 @@ class ConclusionScreen extends React.Component {
   <Text>Dist :{dist}</Text>
   <Text>Max dist :{max_dist}</Text>
   <Text>Route :{route}</Text>
+  <TouchableOpacity onPress={() =>this.handleButton(vehicles,index_vehicles,dist,max_dist,route)}>
+  <Text style={styles.buttonText}>Search Route</Text>
+  </TouchableOpacity>
 
 </KeyboardAvoidingView>
   );

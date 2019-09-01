@@ -269,25 +269,27 @@ await console.log(this.state.arrWaypoints)
 }
 
   
-handleGetGoogleMapDirections = () => {
+handleGetGoogleMapDirections = async () => {
     
-        const data = {
-    
-            source: this.state.origin,
-            destination: this.state.destination,
-            waypoints: this.state.arrWaypoints,
-            params: [
-                {
-                  key: "travelmode",
-                  value: "driving"
-                }
-            ]
-            
-        };
-    
-        getDirections(data)
-    
-      };
+  var data = await {
+
+      source: await this.state.origin,
+      destination: await this.state.destination,
+      waypoints: await this.state.arrWaypoints,
+      params: [
+          {
+            key: "travelmode",
+            value: "driving"
+          }
+      ]
+      
+  };
+   await console.log(data)
+   await getDirections(data);
+
+
+
+};
 
     render() {
         return(

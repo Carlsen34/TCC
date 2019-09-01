@@ -179,13 +179,13 @@ export default class App extends React.Component {
   this.setState({arrWaypoints:arr});
   }
 
-  handleGetGoogleMapDirections = () => {
+  handleGetGoogleMapDirections = async () => {
     
-    const data = {
+    var data = await {
 
-        source: this.state.origin,
-        destination: this.state.destination,
-        waypoints: this.state.arrWaypoints,
+        source: await this.state.origin,
+        destination: await this.state.destination,
+        waypoints: await this.state.arrWaypoints,
         params: [
             {
               key: "travelmode",
@@ -194,7 +194,7 @@ export default class App extends React.Component {
         ]
         
     };
- 
+      await console.log(data)
      getDirections(data);
 
  
