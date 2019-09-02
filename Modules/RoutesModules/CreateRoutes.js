@@ -165,15 +165,23 @@ class ConclusionScreen extends React.Component {
   };
 
   handleButton = (vehicles,index_vehicles,dist,max_dist,route) => {
-    // console.log(vehicles)
-    // console.log(index_vehicles)
-    // console.log(dist)
-    // console.log(max_dist)
-    // console.log(route)
+
 
     index_vehicles.forEach(function(value){
-      console.log(vehicles[value])
-      console.log(route[value])
+      let uuidv1 = require('uuid/v1');
+      let objRoutes =  {
+        body: {
+          "routeName": Auth.user.username + "-" + uuidv1(),
+          "user": vehicles[value],
+          "origin":route[value].shift(),
+          "destination": route[value].pop(),
+          "waypoints":route[value]
+          
+        }
+      }
+
+      console.log(objRoutes)
+
     })
 
    }
