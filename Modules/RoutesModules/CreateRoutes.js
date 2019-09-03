@@ -161,28 +161,96 @@ class ConclusionScreen extends React.Component {
     index_vehicles:[],
     dist:[],
     max_dist:[],
-    route:[]
+    route:[],
+    apiResponse:"",
+    hasRoute:false
+
   };
 
-  handleButton = (vehicles,index_vehicles,dist,max_dist,route) => {
+  async saveRoutes(api,path,objRoutes){
+    try {
+      const apiResponse = await API.put(api, path, objRoutes)
+      console.log("response from saving routes: " + apiResponse);
+      this.setState({apiResponse});
+      return apiResponse;
+    } catch (e) {
+      console.log(e);
+    }
+
+  }
+
+  async auxgetRoutes(){
+    this.setState({animating:true})
+      this.getRoutes(Auth.user.username);
+     this.setState({animating:false})
+   }
+
+async getRoutes(name) {
+    const path = "/getRoute/object/"+name;
+  try {
+    const apiResponse = await API.get("getRoute", path);
+    console.log("response from getting route: " + apiResponse.routeName);
+    this.setState({routeNameList:apiResponse.routeName})
+    this.setState({apiResponse});
 
 
-    index_vehicles.forEach(function(value){
+   return apiResponse;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+
+  handleButton = async (vehicles,index_vehicles,dist,max_dist,route) => {
+
+
+
+      var i;
+      for (i = 0; i < index_vehicles.length; i++) {
+      console.log(i)  
       let uuidv1 = require('uuid/v1');
+   
+
+      var user = vehicles[i]
+      var origin = route[i].shift()
+      var destination = route[i].pop()
+      var waypoints = route[i]
+      var RouteName = Auth.user.username + "-" + uuidv1()
+  
       let objRoutes =  {
         body: {
-          "routeName": Auth.user.username + "-" + uuidv1(),
-          "user": vehicles[value],
-          "origin":route[value].shift(),
-          "destination": route[value].pop(),
-          "waypoints":route[value]
+          "routeName": RouteName,
+          "user": user,
+          "origin":origin,
+          "destination":destination,
+          "waypoints":waypoints
           
         }
       }
+      await this.saveRoutes("Routes","/routes",objRoutes);
 
-      console.log(objRoutes)
+      await this.getRoutes(user)
 
-    })
+      let objRoutesAux = await {
+        body: {
+          "user": user,
+          "routeName": this.state.RouteName
+        }
+      }
+
+      if( await this.state.hasRoute == true){
+        objRoutesAux.body.routeName.push(RouteName);
+      }else{
+        objRoutesAux.body.routeName = [RouteName];
+      }
+
+
+      await this.saveRoutes("getRoute","/getRoute",objRoutesAux);
+      this.auxgetRoutes();
+      alert('Route shared successfully ');
+
+      }
+
 
    }
 
