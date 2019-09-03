@@ -159,8 +159,7 @@ export default class MapScreen extends Component {
       
 
         async sendInput(inputText){
-        await this.setState({isDialogVisible:false})
-
+        await this.setState({isDialogVisible:false}) 
         var user = Auth.user.username;
         var origin = this.state.originText
         var destination = this.state.destinationText
@@ -202,7 +201,8 @@ export default class MapScreen extends Component {
 
     handleButton = () => {
        // const fullAPI = routeAPI +this.state.originText+"|" +this.state.waypointsText + '/' + 1;
-        const fullAPI = routeAPI + this.state.originText + this.state.waypointsText.split(" ").join("+") +'/'+1
+        const fullAPI = routeAPI + this.state.originText.split(" ").join("+") + this.state.waypointsText.split(" ").join("+") +'/'+1
+        console.log(fullAPI)
         fetch(fullAPI).then(response => response.json()).then(data => {
         var arrayAux = []
         data.Route[0].forEach(function (item, indice, array) {
@@ -217,6 +217,7 @@ export default class MapScreen extends Component {
 
 
 async handleArray(params) {
+    await console.log(params)
     let auxArray = []
     await Geocoder.init(GOOGLE_MAPS_APIKEY); // use a valid API key
     await this.setState({originText: params.shift()})

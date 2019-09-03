@@ -163,7 +163,8 @@ class ConclusionScreen extends React.Component {
     max_dist:[],
     route:[],
     apiResponse:"",
-    hasRoute:false
+    hasRoute:false,
+    RouteName:""
 
   };
 
@@ -185,20 +186,28 @@ class ConclusionScreen extends React.Component {
      this.setState({animating:false})
    }
 
-async getRoutes(name) {
-    const path = "/getRoute/object/"+name;
-  try {
-    const apiResponse = await API.get("getRoute", path);
-    console.log("response from getting route: " + apiResponse.routeName);
-    this.setState({routeNameList:apiResponse.routeName})
-    this.setState({apiResponse});
+   async getRoutes(user){
+    var path = "/getRoute/object/" + user;
+    try {
+      const apiResponse = await API.get("getRoute", path)
+      console.log("response from get routes: " + apiResponse.routeName);
+      this.setState({apiResponse});
+      if(apiResponse.routeName != undefined ){
+        this.setState({RouteName:apiResponse.routeName});
+        console.log(this.state.RouteName)
+        this.setState({hasRoute:true});
+        console.log("List Route: " + this.state.RouteName);
+      }else{
+        this.setState({hasRoute:false});
+
+      }
+      return apiResponse;
+    } catch (e) {
+      console.log(e);
+    }
 
 
-   return apiResponse;
-  } catch (e) {
-    console.log(e);
   }
-}
 
 
   handleButton = async (vehicles,index_vehicles,dist,max_dist,route) => {
@@ -207,6 +216,7 @@ async getRoutes(name) {
 
       var i;
       for (i = 0; i < index_vehicles.length; i++) {
+        if(dist[i] != 0){
       console.log(i)  
       let uuidv1 = require('uuid/v1');
    
@@ -246,9 +256,9 @@ async getRoutes(name) {
 
 
       await this.saveRoutes("getRoute","/getRoute",objRoutesAux);
-      this.auxgetRoutes();
+      await this.getRoutes(user)
       alert('Route shared successfully ');
-
+    }
       }
 
 
@@ -269,9 +279,10 @@ async getRoutes(name) {
   <Text>Dist :{dist}</Text>
   <Text>Max dist :{max_dist}</Text>
   <Text>Route :{route}</Text>
-  <TouchableOpacity onPress={() =>this.handleButton(vehicles,index_vehicles,dist,max_dist,route)}>
-  <Text style={styles.buttonText}>Search Route</Text>
-  </TouchableOpacity>
+  <Button 
+  title="Share Route"
+  onPress={() =>this.handleButton(vehicles,index_vehicles,dist,max_dist,route)}/>
+  
 
 </KeyboardAvoidingView>
   );

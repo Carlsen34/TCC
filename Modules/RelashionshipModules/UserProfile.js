@@ -35,20 +35,31 @@ export default class UserProfile extends React.Component {
          this.setState({animating:false})
        }
 
-    async getRoutes(name) {
-        const path = "/getRoute/object/"+name;
-      try {
-        const apiResponse = await API.get("getRoute", path);
-        console.log("response from getting route: " + apiResponse.routeName);
-        this.setState({routeNameList:apiResponse.routeName})
-        this.setState({apiResponse});
-  
-   
-       return apiResponse;
-      } catch (e) {
-        console.log(e);
-      }
-    }
+
+       async getRoutes(user){
+        var path = "/getRoute/object/" + user;
+        try {
+          const apiResponse = await API.get("getRoute", path)
+          console.log("response from get routes: " + apiResponse.routeName);
+          this.setState({routeNameList:apiResponse.routeName})
+          this.setState({apiResponse});
+          if(apiResponse.routeName != undefined ){
+            this.setState({RouteName:apiResponse.routeName});
+            console.log(this.state.RouteName)
+            this.setState({hasRoute:true});
+            console.log("List Route: " + this.state.RouteName);
+          }else{
+            this.setState({hasRoute:false});
+    
+          }
+          return apiResponse;
+        } catch (e) {
+          console.log(e);
+        }
+    
+    
+      }   
+
 
 
     auxShareRoute = async(item) => {
@@ -67,13 +78,13 @@ export default class UserProfile extends React.Component {
 
     shareRoute =  async (shareRoute,shareName) => {
         await this.auxShareRoute(shareRoute);
-
+        let uuidv1 = require('uuid/v1'); 
         var AuthUser = Auth.user.username
         var user = shareName
         var origin = this.state.originText
         var destination = this.state.destinationText
         var waypoints = this.state.waypointsText
-        var RouteName = shareRoute +"-"+ Auth.user.username
+        var RouteName = shareRoute +"-"+ Auth.user.username+"-"+uuidv1()
 
          let objRoutes = await {
           body: {
