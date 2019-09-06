@@ -11,6 +11,10 @@
 		"getRoute": {
 			"service": "DynamoDB",
 			"providerPlugin": "awscloudformation"
+		},
+		"ShareTracking": {
+			"service": "DynamoDB",
+			"providerPlugin": "awscloudformation"
 		}
 	},
 	"function": {
@@ -58,6 +62,21 @@
 					]
 				}
 			]
+		},
+		"ShareTracking": {
+			"service": "Lambda",
+			"providerPlugin": "awscloudformation",
+			"build": true,
+			"dependsOn": [
+				{
+					"category": "storage",
+					"resourceName": "ShareTracking",
+					"attributes": [
+						"Name",
+						"Arn"
+					]
+				}
+			]
 		}
 	},
 	"api": {
@@ -96,6 +115,20 @@
 				{
 					"category": "function",
 					"resourceName": "getRoute",
+					"attributes": [
+						"Name",
+						"Arn"
+					]
+				}
+			]
+		},
+		"ShareTracking": {
+			"service": "API Gateway",
+			"providerPlugin": "awscloudformation",
+			"dependsOn": [
+				{
+					"category": "function",
+					"resourceName": "ShareTracking",
 					"attributes": [
 						"Name",
 						"Arn"

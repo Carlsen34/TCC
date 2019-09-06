@@ -6,6 +6,8 @@ import Relationship from './RelashionshipModules/ListUserRoutes';
 import VRP from './RoutesModules/CreateRoutes';
 import SMP from './RoutesModules/Routes';
 import LoadRoutes from './RoutesModules/LoadRoutes';
+import Tracking from './RoutesModules/Tracking';
+
 
 const createApp = Platform.select({
   default: createAppContainer,
@@ -18,6 +20,7 @@ export default createApp(
       VRP,
       SMP,
       LoadRoutes,
+      Tracking,
     },
     {
       tabBarOptions: {

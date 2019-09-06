@@ -15,10 +15,6 @@ const arr = [];
 Analytics.disable();
 
 
-
-
-
-
 export default class App extends React.Component {
 
   state = {
@@ -32,9 +28,55 @@ export default class App extends React.Component {
     originText: 'Campinas',
     destinationText: 'Sao Paulo',
     waypointsText:'',
-    arrWaypoints:[]
+    arrWaypoints:[],
+    latitude:"",
+    longitude:"",
+    value:1
 
   };
+
+
+
+
+  sharePosition() {
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        this.setState({
+          latitude:position.coords.latitude,
+          longitude:position.coords.longitude,
+          value:this.state.value+1
+        })
+      },
+      error => Alert.alert(error.message),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+    );
+
+    let obj =  {
+      body: {
+      "user":Auth.user.username,
+      "lat":this.state.latitude,
+      "long":this.state.longitude,
+      "value":this.state.value
+      }
+    }
+    console.log(obj)
+    try {
+      const apiResponse = API.put("ShareTracking", "/shareTracking", obj)
+      console.log("response from saving routes: " + apiResponse);
+      this.setState({apiResponse});
+      return apiResponse;
+    } catch (e) {
+      console.log(e);
+    }
+
+
+
+    }
+
+componentDidMount() {
+      this.interval = setInterval(() => this.sharePosition(), 20000);
+    }
+
 
 
   async auxgetRoutes(){
@@ -203,7 +245,7 @@ export default class App extends React.Component {
 
 
    openRoute =  async (item) => {
-
+    this.sharePosition()
     console.log(item);
     
 

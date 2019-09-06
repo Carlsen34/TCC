@@ -1,0 +1,34 @@
+{
+    "paths": [
+        {
+            "name": "/shareTracking",
+            "lambdaFunction": "ShareTracking",
+            "privacy": {
+                "open": true
+            }
+        }
+    ],
+    "resourceName": "ShareTracking",
+    "apiName": "ShareTracking",
+    "functionArns": [
+        {
+            "lambdaFunction": "ShareTracking"
+        }
+    ],
+    "privacy": {
+        "auth": 0,
+        "unauth": 0,
+        "authRoleName": "tcc-projecttcc-20190812170507-authRole",
+        "unAuthRoleName": "tcc-projecttcc-20190812170507-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "ShareTracking",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}

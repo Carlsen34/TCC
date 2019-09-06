@@ -1,0 +1,5 @@
+{
+    "tableName": "ShareTracking",
+    "partitionKeyName": "user",
+    "partitionKeyType": "S"
+}
