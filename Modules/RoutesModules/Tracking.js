@@ -35,22 +35,27 @@ class AnimatedMarkers extends React.Component {
 
 
 
-  componentWillMount() {
-    const path = "/shareTracking/object/"+"edmar";
+
+
+  async getLocation(){
+    var path = "/shareTracking/object/"+"edmar";
     try {
-      const apiResponse = API.get("ShareTracking", path);
-      console.log("response from getting position: " + apiResponse);
+      const apiResponse = await API.get("ShareTracking", path);
+      console.log("response from get routes: " + apiResponse);
       this.setState({latitude:apiResponse.lat})
       this.setState({longitude:apiResponse.long});
       console.log(apiResponse.user)
       console.log(apiResponse.lat)
       console.log(apiResponse.long)
-
- 
-     return apiResponse;
+      return apiResponse;
     } catch (e) {
       console.log(e);
     }
+
+  }
+
+  componentWillMount() {
+    this.getLocation()
   }
 
 

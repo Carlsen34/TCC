@@ -1,125 +1,145 @@
-import React, { Component } from "react";
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-  Alert,
-  TouchableOpacity
-} from "react-native";
+
+import React from "react";
+import {StyleSheet,View,Image,Text,TouchableOpacity,Platform,PermissionsAndroid} from "react-native";
+import MapView, { Marker,AnimatedRegion,Polyline,PROVIDER_GOOGLE} from "react-native-maps";
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
+import AWSConfig from '../../aws-exports';
 
+// const LATITUDE = 29.95539;
+// const LONGITUDE = 78.07513;
+const LATITUDE_DELTA = 0.009;
+const LONGITUDE_DELTA = 0.009;
+const LATITUDE = -22.8166911;
+const LONGITUDE = -47.0151616;
 
-export default class App extends Component {
-  state = {
-    user:"teste",
-    latitude:null,
-    longitude:null,
-    value: 1
-  };
+class AnimatedMarkers extends React.Component {
+  constructor(props) {
+    super(props);
 
-  componentWillMount = () => {
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        this.setState({
-          latitude:position.coords.latitude,
-          longitude:position.coords.longitude,
-          value:this.state.value+1
+    this.state = {
+    origin: { latitude: LATITUDE -5, longitude: LONGITUDE -5 },
+    destination: { latitude: LATITUDE + 5, longitude: LONGITUDE + 5},
+    trackingSpot: { latitude: 42.3730591, longitude: -71.033754 },
+    latitude: LATITUDE,
+    longitude: LONGITUDE,
+    routeCoordinates: [],
+    distanceTravelled: 0,
+    prevLatLng: {},
 
-        })
-
-        let obj =  {
-          body: {
-          "user":this.state.user,
-          "lat":this.state.latitude,
-          "long":this.state.longitude,
-          "value":this.state.value
-          }
-        }
-        try {
-          const apiResponse = API.put("ShareTracking", "/shareTracking", obj)
-          console.log("response from saving routes: " + apiResponse);
-          this.setState({apiResponse});
-          return apiResponse;
-        } catch (e) {
-          console.log(e);
-        }
+    };
+  }
 
 
 
-      },
-      error => Alert.alert(error.message),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-    );
+  async getLocation(){
+    var path = "/shareTracking/object/"+"edmar";
+    try {
+      const apiResponse = await API.get("ShareTracking", path);
+      console.log("response from get routes: " + apiResponse);
+      this.setState({latitude:apiResponse.lat})
+      this.setState({longitude:apiResponse.long});
+      this.setState({
+        trackingSpot:{ latitude:apiResponse.lat, longitude:apiResponse.long },
 
-  };
-
-
-  sharePosition() {
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        this.setState({
-          latitude:position.coords.latitude,
-          longitude:position.coords.longitude,
-          value:this.state.value+1
-        })
-
-        let obj =  {
-          body: {
-          "user":this.state.user,
-          "lat":this.state.latitude,
-          "long":this.state.longitude,
-          "value":this.state.value
-          }
-        }
-        try {
-          const apiResponse = API.put("ShareTracking", "/shareTracking", obj)
-          console.log("response from saving routes: " + apiResponse);
-          this.setState({apiResponse});
-          return apiResponse;
-        } catch (e) {
-          console.log(e);
-        }
+      })
 
 
-      },
-      error => Alert.alert(error.message),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-    );
+
+
+      console.log(apiResponse.user)
+      console.log(apiResponse.lat)
+      console.log(apiResponse.long)
+      return apiResponse;
+    } catch (e) {
+      console.log(e);
     }
+
+  }
+
+  componentWillMount() {
+    this.getLocation()
+  }
 
 componentDidMount() {
-      this.interval = setInterval(() => this.sharePosition(), 20000);
+      this.interval = setInterval(() => this.getLocation(), 200);
     }
+  
+
+  getMapRegion = () => ({
+    latitude: this.state.latitude,
+    longitude: this.state.longitude,
+    latitudeDelta: LATITUDE_DELTA,
+    longitudeDelta: LONGITUDE_DELTA
+  });
+
+ 
 
   render() {
     return (
       <View style={styles.container}>
-          <Text>Latitude: {this.state.latitude}</Text>
-          <Text>Longitude: {this.state.longitude}</Text>
-          <Text>Value: {this.state.value}</Text>
-
-
+        <MapView
+          style={styles.map}
+          provider={PROVIDER_GOOGLE}
+          showUserLocation
+          followUserLocation
+          loadingEnabled
+          region={{
+            latitude: (this.state.origin.latitude + this.state.destination.latitude) / 2,
+            longitude: (this.state.origin.longitude + this.state.destination.longitude) / 2,
+            latitudeDelta: Math.abs(this.state.origin.latitude - this.state.destination.latitude) + Math.abs(this.state.origin.latitude - this.state.destination.latitude) * .1,
+            longitudeDelta: Math.abs(this.state.origin.longitude - this.state.destination.longitude) + Math.abs(this.state.origin.longitude - this.state.destination.longitude) * .1,
+          }
+        }
+        >
+          <Polyline coordinates={this.state.routeCoordinates} strokeWidth={5} />
+          <Marker.Animated
+            ref={marker => {
+              this.marker = marker;
+            }}
+            coordinate={this.state.trackingSpot}
+          >
+            <Image
+              source={require("./car.png")}
+              style={{ height: 35, width: 35 }}
+            />
+          </Marker.Animated>
+        </MapView>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center",
-      backgroundColor: "#F5FCFF"
-    },
-    welcome: {
-      fontSize: 20,
-      textAlign: "center",
-      margin: 10
-    },
-    instructions: {
-      textAlign: "center",
-      color: "#333333",
-      marginBottom: 5
-    }
-  });
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "flex-end",
+    alignItems: "center"
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject
+  },
+  bubble: {
+    flex: 1,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 20
+  },
+  latlng: {
+    width: 200,
+    alignItems: "stretch"
+  },
+  button: {
+    width: 80,
+    paddingHorizontal: 12,
+    alignItems: "center",
+    marginHorizontal: 10
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    marginVertical: 20,
+    backgroundColor: "transparent"
+  }
+});
+
+export default AnimatedMarkers;
