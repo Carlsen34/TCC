@@ -1,49 +1,130 @@
 
 import React from "react";
-import {StyleSheet,View,Image,Text,TouchableOpacity,Platform,PermissionsAndroid} from "react-native";
+import {StyleSheet,View, Text,Image, Button,TextInput,KeyboardAvoidingView,FlatList,TouchableOpacity } from 'react-native';
+import { createAppContainer, createStackNavigator, StackActions, NavigationActions } from 'react-navigation'; 
 import MapView, { Marker,AnimatedRegion,Polyline,PROVIDER_GOOGLE} from "react-native-maps";
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
 
-// const LATITUDE = 29.95539;
-// const LONGITUDE = 78.07513;
+
 const LATITUDE_DELTA = 0.009;
 const LONGITUDE_DELTA = 0.009;
 const LATITUDE = 37.78825;
 const LONGITUDE = -122.4324;
 
 class AnimatedMarkers extends React.Component {
+  state = {
+    Friends:'',
+    vehicles: []
+  };
+
+
+
+completeRoute = (user) => {
+  this.props.navigation.navigate('ShareScreen', {
+    user:user
+}
+)
+}
+
+async auxgetUser(){
+    this.setState({animating:true})
+    var user = Auth.user.username;
+    this.getUser(user);
+    this.setState({animating:false})
+}
+
+
+async getUser(name) {
+    console.log(name);
+    const path = "/friendship/object/" + name;
+    try {
+      const APIResponse = await API.get("Friendship", path);
+      console.log("response from getting note: " + APIResponse.Friends);
+      this.setState({APIResponse});
+      if(APIResponse.Friends != undefined ){
+        this.setState({Friends:APIResponse.Friends});
+        this.setState({hasFriend:true});
+        console.log("List Friends: " + this.state.Friends);
+      }else{
+        this.setState({hasFriend:false});
+  
+      }
+    
+      return APIResponse;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+
+componentWillMount(){
+        this.auxgetUser();
+ }
+
+  render() {
+    const { navigation } = this.props;
+    const route = navigation.getParam('route', '');
+
+    
+    return (
+<KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+ <Text>TRACKING ROUTE</Text>
+      <FlatList
+      style={{ marginTop: 30 }}
+      contentContainerStyle={styles.list}
+      data={this.state.Friends}
+      renderItem = {({item}) =>
+         <View style={styles.listItem}>
+        <TouchableOpacity onPress={() =>this.completeRoute(item)}>
+      <Text>{item}</Text>
+        </TouchableOpacity>
+    </View>
+    }
+      keyExtractor={(item, index) => index.toString()}
+    />
+  <Text>{this.state.vehicles}</Text>
+</KeyboardAvoidingView>
+    );
+  }
+}
+
+
+class ShareScreen extends React.Component {
+
+
+  
   constructor(props) {
     super(props);
+    const { navigation } = this.props;
 
     this.state = {
-    origin: { latitude: 42.3616132, longitude: -71.0672576 },
-    destination: { latitude: 42.3730591, longitude: -71.033754 },
-      latitude: LATITUDE,
-      longitude: LONGITUDE,
-      routeCoordinates: [],
-      distanceTravelled: 0,
-      prevLatLng: {},
-      coordinate: new AnimatedRegion({
-        latitude: LATITUDE,
-        longitude: LONGITUDE,
-        latitudeDelta: 0,
-        longitudeDelta: 0
-      })
+    trackingSpot: { latitude: 42.3730591, longitude: -71.033754 },
+    latitude: "",
+    longitude: "",
+    routeCoordinates: [],
+    prevLatLng: {},
+    userTracking:navigation.getParam('user', '')
+
     };
   }
 
 
 
-
-
   async getLocation(){
-    var path = "/shareTracking/object/"+"edmar";
+    var path = "/shareTracking/object/"+this.state.userTracking;
     try {
       const apiResponse = await API.get("ShareTracking", path);
       console.log("response from get routes: " + apiResponse);
       this.setState({latitude:apiResponse.lat})
       this.setState({longitude:apiResponse.long});
+      this.setState({
+        trackingSpot:{ latitude:apiResponse.lat, longitude:apiResponse.long }
+      })
+
+
+
+
       console.log(apiResponse.user)
       console.log(apiResponse.lat)
       console.log(apiResponse.long)
@@ -58,7 +139,9 @@ class AnimatedMarkers extends React.Component {
     this.getLocation()
   }
 
-
+componentDidMount() {
+      this.interval = setInterval(() => this.getLocation(), 2000);
+    }
   
 
   getMapRegion = () => ({
@@ -71,28 +154,31 @@ class AnimatedMarkers extends React.Component {
  
 
   render() {
+
     return (
-      <View style={styles.container}>
-        <MapView
-          style={styles.map}
-          provider={PROVIDER_GOOGLE}
-          showUserLocation
-          followUserLocation
-          loadingEnabled
+      <View style={styles1.container}>
+      <MapView
+          ref={map => this.mapView = map}
+          style={styles1.map}
           region={{
-            latitude: (this.state.origin.latitude + this.state.destination.latitude) / 2,
-            longitude: (this.state.origin.longitude + this.state.destination.longitude) / 2,
-            latitudeDelta: Math.abs(this.state.origin.latitude - this.state.destination.latitude) + Math.abs(this.state.origin.latitude - this.state.destination.latitude) * .1,
-            longitudeDelta: Math.abs(this.state.origin.longitude - this.state.destination.longitude) + Math.abs(this.state.origin.longitude - this.state.destination.longitude) * .1,
-          }
-        }
+            latitude: (this.state.latitude  + this.state.latitude) / 2,
+            longitude: (this.state.longitude + this.state.longitude) / 2,
+            latitudeDelta: Math.abs(this.state.latitude - (this.state.latitude -0.01)) + Math.abs(this.state.latitude - (this.state.latitude -0.01)) * .1,
+            longitudeDelta: Math.abs(this.state.longitude - this.state.longitude) + Math.abs(this.state.longitude - this.state.longitude) * .1,
+          }}
+
+          loadingEnabled={true}
+          toolbarEnabled={true}
+       
         >
-          <Polyline coordinates={this.state.routeCoordinates} strokeWidth={5} />
+
+
+
           <Marker.Animated
             ref={marker => {
               this.marker = marker;
             }}
-            coordinate={this.state.coordinate}
+            coordinate={this.state.trackingSpot}
           >
             <Image
               source={require("./car.png")}
@@ -100,17 +186,15 @@ class AnimatedMarkers extends React.Component {
             />
           </Marker.Animated>
         </MapView>
-        <View style={styles.buttonContainer}>
-          <Text style={styles.bottomBarContent}>
-            {parseFloat(this.state.distanceTravelled).toFixed(2)} km
-          </Text>
-        </View>
       </View>
     );
   }
 }
 
-const styles = StyleSheet.create({
+
+
+
+const styles1 = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: "flex-end",
@@ -143,4 +227,58 @@ const styles = StyleSheet.create({
   }
 });
 
-export default AnimatedMarkers;
+
+
+
+const styles = StyleSheet.create({
+  container: {
+    margin: 30,
+    flex: 5,
+    backgroundColor: '#fff',
+    padding: 16,
+  
+  },  list: {
+    paddingHorizontal: 20,
+  },  
+  listItem: {
+    backgroundColor: '#EEE',
+    marginTop: 20,
+    padding: 30,
+  },
+  input: {
+    height: 50,
+    borderBottomWidth: 2,
+    borderBottomColor: '#2196F3',
+    margin: 10,
+  }
+   
+  });
+  
+  const AppNavigator = createStackNavigator({
+    AnimatedMarkers: {
+      screen: AnimatedMarkers,
+        navigationOptions:  {
+        header: null
+    }
+    },
+
+   
+
+  
+      ShareScreen: {
+      screen: ShareScreen,
+        navigationOptions:  {
+        header: null
+    }
+   
+  },
+  
+  }, {
+      initialRouteName: 'AnimatedMarkers',
+  }
+  
+  
+  
+  );
+
+export default AppNavigator;

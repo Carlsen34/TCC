@@ -305,7 +305,7 @@ handleGetGoogleMapDirections = async () => {
               region={{
                 latitude: (this.state.origin.latitude + this.state.destination.latitude) / 2,
                 longitude: (this.state.origin.longitude + this.state.destination.longitude) / 2,
-                latitudeDelta: Math.abs(this.state.origin.latitude - this.state.destination.latitude) + Math.abs(this.state.origin.latitude - this.state.destination.latitude) * .1,
+                latitudeDelta: Math.abs(this.state.origin.latitude - (this.state.destination.latitude  -0.2)) + Math.abs(this.state.origin.latitude - (this.state.destination.latitude -0.2)) * .1,
                 longitudeDelta: Math.abs(this.state.origin.longitude - this.state.destination.longitude) + Math.abs(this.state.origin.longitude - this.state.destination.longitude) * .1,
               }}
     
