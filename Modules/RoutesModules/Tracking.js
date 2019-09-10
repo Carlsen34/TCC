@@ -115,6 +115,12 @@ class ShareScreen extends React.Component {
     var path = "/shareTracking/object/"+this.state.userTracking;
     try {
       const apiResponse = await API.get("ShareTracking", path);
+      if(apiResponse.onRide != true){
+        alert("Usuario não está em rota")
+        clearInterval(this.interval);
+        this.props.navigation.navigate('AnimatedMarkers')
+        return
+      }
       console.log("response from get routes: " + apiResponse);
       this.setState({latitude:apiResponse.lat})
       this.setState({longitude:apiResponse.long});
@@ -122,7 +128,7 @@ class ShareScreen extends React.Component {
         trackingSpot:{ latitude:apiResponse.lat, longitude:apiResponse.long }
       })
 
-
+      
 
 
       console.log(apiResponse.user)
@@ -140,7 +146,7 @@ class ShareScreen extends React.Component {
   }
 
 componentDidMount() {
-      this.interval = setInterval(() => this.getLocation(), 2000);
+      this.interval = setInterval(() => this.getLocation(), 10000);
     }
   
 
@@ -163,7 +169,7 @@ componentDidMount() {
           region={{
             latitude: (this.state.latitude  + this.state.latitude) / 2,
             longitude: (this.state.longitude + this.state.longitude) / 2,
-            latitudeDelta: Math.abs(this.state.latitude - (this.state.latitude -0.01)) + Math.abs(this.state.latitude - (this.state.latitude -0.01)) * .1,
+            latitudeDelta: Math.abs(this.state.latitude - (this.state.latitude -0.02)) + Math.abs(this.state.latitude - (this.state.latitude -0.02)) * .1,
             longitudeDelta: Math.abs(this.state.longitude - this.state.longitude) + Math.abs(this.state.longitude - this.state.longitude) * .1,
           }}
 

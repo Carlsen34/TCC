@@ -2,6 +2,7 @@ import React from 'react';
 import { TextInput, Button, StyleSheet,KeyboardAvoidingView} from 'react-native';
 import Amplify, { Auth } from 'aws-amplify';
 import awsconfig from '../../aws-exports';
+import * as TaskManager from 'expo-task-manager';
 Amplify.configure(awsconfig);
 
 
@@ -19,7 +20,8 @@ export default class App extends React.Component {
     });
   }
 
-  signIn() {   
+  signIn() {
+    TaskManager.unregisterAllTasksAsync()   
     const { username, password } = this.state;
     Auth.signIn(username, password)
       .then(user => {

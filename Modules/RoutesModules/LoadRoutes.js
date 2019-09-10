@@ -31,12 +31,34 @@ export default class App extends React.Component {
     arrWaypoints:[],
     latitude:"",
     longitude:"",
-    value:1
+    value:1,
+    onRide:false
 
   };
 
 
+  cancelSharePositionAux(){
 
+    let obj = {
+      body: {
+      "user":Auth.user.username,
+      "lat":"1",
+      "long":"1",
+      "value":1,
+      "onRide":false
+      }
+    }
+    console.log(obj)
+    try {
+      const apiResponse = API.put("ShareTracking", "/shareTracking", obj)
+      console.log("response from saving routes: " + apiResponse);
+      this.setState({apiResponse});
+      return apiResponse;
+    } catch (e) {
+      console.log(e);
+    }
+
+  }
 
   sharePosition() {
     navigator.geolocation.getCurrentPosition(
@@ -44,7 +66,8 @@ export default class App extends React.Component {
         this.setState({
           latitude:position.coords.latitude,
           longitude:position.coords.longitude,
-          value:this.state.value+1
+          value:this.state.value+1,
+          onRide:true
         })
       },
       error => Alert.alert(error.message),
@@ -56,7 +79,8 @@ export default class App extends React.Component {
       "user":Auth.user.username,
       "lat":this.state.latitude,
       "long":this.state.longitude,
-      "value":this.state.value
+      "value":this.state.value,
+      "onRide":this.state.onRide
       }
     }
     console.log(obj)
@@ -73,11 +97,15 @@ export default class App extends React.Component {
 
     }
 
-componentDidMount() {
-      this.interval = setInterval(() => this.sharePosition(), 20000);
+ async startSharePosition(){
+      this.sharePosition()
+      this.interval = setInterval(() => this.sharePosition(), 8000);
     }
 
-
+ async cancelSharePosition(){
+  clearInterval(this.interval);
+  this.cancelSharePositionAux()
+    }
 
   async auxgetRoutes(){
    this.setState({animating:true})
@@ -222,7 +250,7 @@ componentDidMount() {
   }
 
   handleGetGoogleMapDirections = async () => {
-    
+    await this.sharePosition()
     var data = await {
 
         source: await this.state.origin,
@@ -295,6 +323,19 @@ render(){
    <Button 
     title="Delete Routes"
      onPress={this.auxdeleteRoutes.bind(this)} /> 
+    <Text></Text>
+
+    <Button 
+    
+    title="Compartilhamento de Localizacao"
+     onPress={this.startSharePosition.bind(this)} /> 
+    <Text></Text>
+
+    <Button 
+    title="Cancelamento de Localizacao"
+     onPress={this.cancelSharePosition.bind(this)} /> 
+
+
       <FlatList
       style={{ marginTop: 30 }}
       contentContainerStyle={styles.list}

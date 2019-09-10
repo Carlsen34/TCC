@@ -4,7 +4,7 @@ import { createAppContainer, createBottomTabNavigator } from 'react-navigation';
 
 import SignIn from './SignIn';
 import SignUp from './SignUp';
-import RealTimeTracking from './RealTimeTracking';
+
 
 
 const createApp = Platform.select({
@@ -15,8 +15,8 @@ export default createApp(
   createBottomTabNavigator(
     {
       SignIn,
-      SignUp,
-      RealTimeTracking
+      SignUp
+      
     },
     {
       tabBarOptions: {
