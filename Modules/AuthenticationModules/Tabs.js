@@ -4,6 +4,7 @@ import { createAppContainer, createBottomTabNavigator } from 'react-navigation';
 
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import test from './Test';
 
 
 
@@ -15,7 +16,8 @@ export default createApp(
   createBottomTabNavigator(
     {
       SignIn,
-      SignUp
+      SignUp,
+      test
       
     },
     {

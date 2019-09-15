@@ -8,17 +8,18 @@ import {
   TouchableOpacity,
   TextInput,
   Dimensions,
-  Image,
+  Button,
   KeyboardAvoidingView,
   StyleSheet
 } from 'react-native';
-import DialogInput from 'react-native-dialog-input';
+import DialogInput from 'react-native-dialog-input';    
 import MapView from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import getDirections from 'react-native-google-maps-directions'
 import { PermissionsAndroid } from 'react-native';
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import Geocoder from 'react-native-geocoding';
+import { createAppContainer, createStackNavigator, StackActions, NavigationActions } from 'react-navigation'; 
 
 const GOOGLE_MAPS_APIKEY = AWSConfig.GOOGLEAPI;
 const routeAPI = 'http://vrp-dev.us-east-1.elasticbeanstalk.com/api/v1/vrp/route=';
@@ -28,7 +29,61 @@ const backgroundColor = '#007256';
 
 const { height, width } = Dimensions.get('window');
 
-export default class MapScreen extends Component {
+
+
+class AddressScreen extends React.Component {
+
+  state = {
+       originText: '',
+       waypointsText:''
+     };
+
+   onChangeText(key, value) {
+   var str = value.split(" ").join("+");
+   this.setState({
+     [key]: str,
+   });
+ }
+
+  saveButton = () => {
+     const { originText,waypointsText} = this.state;
+ 
+        /* 1. Navigate to the Details route with params */
+           this.props.navigation.navigate('MapScreen', {
+             origin:originText,
+             waypoints:waypointsText
+           })
+   }
+
+
+
+ render() {
+
+   return (
+  <KeyboardAvoidingView style={styles1.container} behavior="padding">
+
+       <TextInput
+         onChangeText={value => this.onChangeText('originText', value+'|')}
+         style={styles1.input}
+         placeholder="originText"
+       />
+
+      <TextInput
+         onChangeText={value => this.onChangeText('waypointsText', value)}
+         style={styles1.input}
+         placeholder="waypointsText"
+       />
+     
+     <Button title="Create Route" onPress={this.saveButton.bind(this)} />    
+     </KeyboardAvoidingView>
+   );
+ }  
+}
+
+
+
+
+ class MapScreen extends Component {
 
     state = {
         isDialogVisible:false,
@@ -109,6 +164,13 @@ export default class MapScreen extends Component {
         }
 
         this.getLocation();
+
+        const { navigation } = this.props;
+        const origin = navigation.getParam('origin', '');
+        const waypoints = navigation.getParam('waypoints', '');
+
+        console.log(origin)
+        console.log(waypoints)
 
       }
 
@@ -384,6 +446,34 @@ handleGetGoogleMapDirections = async () => {
 
 }
 
+
+
+const styles1 = StyleSheet.create({
+  container: {
+    margin: 30,
+    flex: 5,
+    backgroundColor: '#fff',
+    padding: 16,
+  
+  },  list: {
+    paddingHorizontal: 20,
+  },  
+  listItem: {
+    backgroundColor: '#EEE',
+    marginTop: 20,
+    padding: 30,
+  },
+  input: {
+    height: 50,
+    borderBottomWidth: 2,
+    borderBottomColor: '#2196F3',
+    margin: 10,
+  }
+   
+  });
+
+
+
 const styles = StyleSheet.create({
 
     container: {
@@ -445,3 +535,28 @@ const styles = StyleSheet.create({
 
 });
 
+const AppNavigator = createStackNavigator({
+  AddressScreen: {
+    screen: AddressScreen,
+      navigationOptions:  {
+      header: null
+  }
+  },
+  MapScreen: {
+    screen: MapScreen,
+      navigationOptions:  {
+      header: null
+  }
+ 
+},
+
+
+}, {
+    initialRouteName: 'AddressScreen',
+}
+
+
+
+);
+
+export default createAppContainer(AppNavigator);
