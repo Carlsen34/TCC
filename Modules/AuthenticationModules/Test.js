@@ -1,246 +1,292 @@
 import React from 'react';
+import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity} from 'react-native';
+import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
 
-import {StyleSheet,View, Text, Button,TextInput,KeyboardAvoidingView,FlatList,TouchableOpacity } from 'react-native';
-import { createAppContainer, createStackNavigator, StackActions, NavigationActions } from 'react-navigation'; 
-import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
-import DialogInput from 'react-native-dialog-input';
-import MapView from 'react-native-maps';
-import MapViewDirections from 'react-native-maps-directions';
-import getDirections from 'react-native-google-maps-directions'
-import { PermissionsAndroid } from 'react-native';
-import Geocoder from 'react-native-geocoding';
-const GOOGLE_MAPS_APIKEY = AWSConfig.GOOGLEAPI;
+var AWS = require('aws-sdk');
+Amplify.configure(AWSConfig);
 
-const routeAPI = 'http://vrp-dev.us-east-1.elasticbeanstalk.com/api/v1/vrp/route=';
-const arr = [];
+Analytics.disable();
 
+AWS.config.update({
+    credentials: new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: AWSConfig.aws_cognito_identity_pool_id
+    }),
+    region: AWSConfig.aws_project_region
+  });
 
-class AddressScreen extends React.Component {
+const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
 
-   state = {
-        originText: '',
-        waypointsText:''
-      };
+ var params = {
+  UserPoolId: AWSConfig.aws_user_pools_id,
+  AttributesToGet:[],
+ }
 
-    onChangeText(key, value) {
-    var str = value.split(" ").join("+");
-    this.setState({
-      [key]: str,
-    });
-  }
-
-   saveButton = () => {
-      const { originText,waypointsText} = this.state;
+export default class ListUsers extends React.Component {
   
-         /* 1. Navigate to the Details route with params */
-            this.props.navigation.navigate('MapScreen', {
-              origin:originText,
-              waypoints:waypointsText
-            })
-    }
 
+  state = {
+    apiResponse: null,
+    Users: '',
+    Friends:'',
+    NewFriend:'',
+    hasFriend:false,
+    animating:true
+  };
 
-
-  render() {
- 
-    return (
-   <KeyboardAvoidingView style={styles.container} behavior="padding">
-
-        <TextInput
-          onChangeText={value => this.onChangeText('originText', value+'|')}
-          style={styles.input}
-          placeholder="originText"
-        />
-
-       <TextInput
-          onChangeText={value => this.onChangeText('waypointsText', value)}
-          style={styles.input}
-          placeholder="waypointsText"
-        />
-      
-      <Button title="Create Route" onPress={this.saveButton.bind(this)} />    
-      </KeyboardAvoidingView>
-    );
-  }  
+  handleChangeUser = (event) => {
+    this.setState({NewFriend: event});
 }
 
 
- class MapScreen extends React.Component {
-  state ={
-    isDialogVisible:false,
-    origin: { latitude: 42.3616132, longitude: -71.0672576 },
-    destination: { latitude: 42.3730591, longitude: -71.033754 },
-    waypoints:{ latitude: 0, longitude: 0 },
-    originText: '',
-    destinationText: '',
-    waypointsText:'',
-    RouteName:'',
-    hasRoute: false,
-    arrWaypoints:[],
+async auxgetUser(){
+  this.setState({animating:true})
+  var user = "edmar";
+   this.getUser(user);
+  this.setState({animating:false})
+}
+
+async auxFriend(){
+  this.setState({animating:true})
+  var user =  "edmar";
+  var newFriend =  this.state.NewFriend;
+  await this.newFriend(user,newFriend);
+  await this.newFriend(newFriend,user)
+  await this.getUser(user);
+  this.setState({animating:false})
+  alert('Friendship added successfully');
+}
+
+
+async auxDeleteUser(friend){
+  console.log(friend)
+  this.setState({animating:true})
+  var user =  "edmar";
+  var newFriend =  friend;
+  await this.deleteUser(user,newFriend);
+  await this.deleteUser(newFriend,user)
+  await this.getUser(user);
+  this.setState({animating:false})
+  alert('Friendship successfully disbanded!');
+
+
+}
+
+
+
+
+async getUser(name) {
+  console.log(name);
+  const path = "/friendship/object/" + name;
+  try {
+    const apiResponse = await API.get("Friendship", path);
+    console.log("response from getting note: " + apiResponse.Friends);
+    this.setState({apiResponse});
+    if(apiResponse.Friends != undefined ){
+      this.setState({Friends:apiResponse.Friends});
+      this.setState({hasFriend:true});
+      console.log("List Friends: " + this.state.Friends);
+    }else{
+      this.setState({hasFriend:false});
+
+    }
+  
+    return apiResponse;
+  } catch (e) {
+    console.log(e);
   }
-  
-
-  async componentDidMount() {
+}
 
 
-    const { navigation } = this.props;
-    const origin = navigation.getParam('origin', '');
-    const waypoints = navigation.getParam('waypoints', '');
-    this.setState({
-      originText:origin,
-      waypointsText:waypoints
-    })
+async  deleteUser(user,newFriends) {
+  await  this.getUser(user);
+  var friends = await this.state.Friends;
+  await cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
+  if (err) console.log("ERROR "+err, err.stack); // an error occurred
+  else{
+    for(var resp in data.Users){
+      var objUsername = data.Users[resp].Username;
+      var objUserStatus = data.Users[resp].UserStatus;
+
+      if(newFriends == objUsername && objUserStatus == "CONFIRMED" ){
+        let objNewFriend = {
+          body: {
+            "Users": user,
+            "Friends":friends
+          }
+        }
+
+        var indice = objNewFriend.body.Friends.indexOf(newFriends);
+        if(indice == -1){
+          console.log("Cant unfriend");
+        } else{
+          objNewFriend.body.Friends.splice(indice,1);
+          const path = "/friendship";
+      
+          // Use the API module to save the note to the database
+          try {
+            const apiResponse =  API.put("Friendship", path, objNewFriend)
+            console.log("response from saving note: " + apiResponse);
+            this.setState({apiResponse});
+            return apiResponse;
+          } catch (e) {
+         
+            console.log(e);
+          }
+        }
+      }
+    }
+  } ;           // successful response
+});
+
+}
 
 
 
+ async  newFriend(user,newFriends) {
+    await  this.getUser(user);
+    var friends = await this.state.Friends;
+    var hasFriend = await this.state.hasFriend;
+
+    await cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
+    if (err) console.log("ERROR "+err, err.stack); // an error occurred
+    else{
+      for(var resp in data.Users){
+        var objUsername = data.Users[resp].Username;
+        var objUserStatus = data.Users[resp].UserStatus;
+       
+        if(objUsername != user && newFriends == objUsername && objUserStatus == "CONFIRMED" ){
+          let objNewFriend = {
+            body: {
+              "Users": user,
+              "Friends":friends
+            }
+          }
+
+          if(hasFriend == true){
+            for(var resp in  objNewFriend.body.Friends){
+              if(objNewFriend.body.Friends[resp] == newFriends ){
+                return
+              }
+            }
+            objNewFriend.body.Friends.push(newFriends);
+          }else{
+            objNewFriend.body.Friends = [newFriends];
+          }
+         
+          const path = "/friendship";
+        
+          // Use the API module to save the note to the database
+          try {
+            const apiResponse =  API.put("Friendship", path, objNewFriend)
+            console.log(path)
+            console.log(objNewFriend)
+            console.log("response from saving note: " + apiResponse);
+            this.setState({apiResponse});
+            return apiResponse;
+          } catch (e) {
+            console.log(e);
+          }
+
+        }else{
+          console.log("Impossivel adicionar amigo");
+        }
+      }
+    } ;           
+  });
+
+ }
 
 
+componentWillMount(){
+   this.auxgetUser();
   }
 
+render(){
+    if(this.state.animating){
+      return ( 
+     <KeyboardAvoidingView style={styles.container} behavior="padding" enabled> 
+       <Button 
+      title="New Friend"
+       onPress={this.auxFriend.bind(this)} 
+       />
+       <Text></Text>
+      <ActivityIndicator
+        size="large" 
+        color="#0000ff" 
+        animating = {this.state.animating}/>
 
-  render() {
+        </KeyboardAvoidingView>
+        )
+    }
+    if(!this.state.animating){
+    return(
+      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+      <Button 
+      title="New Friend"
+       onPress={this.auxFriend.bind(this)} 
+       />
+       <Text></Text>
 
+      <FlatList
+        style={{ marginTop: 15 }}
+        contentContainerStyle={styles.list}
+        data={this.state.Friends}
+        renderItem = {({item}) =>
+        <View style={styles.listItem}>
+          <TouchableOpacity  onPress={() => {
+            this.props.navigation.navigate('UserProfile', {
+              itemId: 86,
+              name: item,
+          })
+          }}>
+        <Text>{item}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress ={() => this.auxDeleteUser(item)} >
+            <Text>X</Text>
+          </TouchableOpacity>
 
-
-      return(
-
-          <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
- <MapView
-  
-  ref={map => this.mapView = map}
-  style={styles.map}
-
-  region={{
-    latitude: (this.state.origin.latitude + this.state.destination.latitude) / 2,
-    longitude: (this.state.origin.longitude + this.state.destination.longitude) / 2,
-    latitudeDelta: Math.abs(this.state.origin.latitude - (this.state.destination.latitude  -0.2)) + Math.abs(this.state.origin.latitude - (this.state.destination.latitude -0.2)) * .1,
-    longitudeDelta: Math.abs(this.state.origin.longitude - this.state.destination.longitude) + Math.abs(this.state.origin.longitude - this.state.destination.longitude) * .1,
-  }}
-
-  loadingEnabled={true}
-  toolbarEnabled={true}
-  zoomControlEnabled={true}
-  
->
-
-<MapView.Marker
-  coordinate={this.state.destination}
->
-  <MapView.Callout onPress={this.handleGetGoogleMapDirections}>
-    <Text>Press to Get Direction</Text>
-  </MapView.Callout>
-</MapView.Marker>
-{/* 
-<MapView.Marker
-  coordinate={this.state.waypoints}
->
-</MapView.Marker> */}
-
-<MapView.Marker
-  coordinate={this.state.origin}
->
-<MapView.Callout>
-    <Text>This is where you are</Text>
-</MapView.Callout>
-</MapView.Marker>
-
-<MapViewDirections
-  origin={this.state.origin}
-  waypoints={this.state.arrWaypoints}
-  destination={this.state.destination}
-  apikey={GOOGLE_MAPS_APIKEY}
-/>
-
-</MapView>
-
-<DialogInput isDialogVisible={this.state.isDialogVisible}
-title={"Route Name"}
-message={"Enter your route name"}
-hintInput ={"Enter your route name"}
-submitInput={ (inputText) => {this.sendInput(inputText)} }
-closeDialog={ () => { this.setState({isDialogVisible:false})}}>
-</DialogInput>
-{/* 
-  <TextInput
-      onChangeText={text => this.onChangeText('originText', text+'|')}
-      style={styles.input}
-      placeholder="Origin"
-  />
-    <TextInput
-      onChangeText={text => this.onChangeText('waypointsText', text+'|')}
-      style={styles.input}
-      placeholder="Waypoints"
+      </View>
+      
+      }
+        keyExtractor={(item, index) => index.toString()}
       />
 
-    <TouchableOpacity style={styles.button} onPress={this.handleButton}>
-
-        <Text style={styles.buttonText}>Search Route</Text>
-
-    </TouchableOpacity> */}
-
-    <TouchableOpacity style={styles.button} onPress={this.saveButton}>
-
-        <Text style={styles.buttonText}>Save Route</Text>
-
-    </TouchableOpacity>
-  
-          </KeyboardAvoidingView>
-
-      );
-
+      <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
+</KeyboardAvoidingView>
+    )
   }
- 
 }
-
+};
 
 
 const styles = StyleSheet.create({
-container: {
-  margin: 30,
-  flex: 5,
-  backgroundColor: '#fff',
-  padding: 16,
+  container: {
+    margin: 30,
+    flex: 5,
+    backgroundColor: '#fff',
+    padding: 16,
 
-},  list: {
-  paddingHorizontal: 20,
-},  
-listItem: {
-  backgroundColor: '#EEE',
-  marginTop: 20,
-  padding: 30,
-},
-input: {
-  height: 50,
-  borderBottomWidth: 2,
-  borderBottomColor: '#2196F3',
-  margin: 10,
-}
- 
-});
-
-const AppNavigator = createStackNavigator({
-  AddressScreen: {
-    screen: AddressScreen,
-      navigationOptions:  {
-      header: null
-  }
   },
-  MapScreen: {
-    screen: MapScreen,
-      navigationOptions:  {
-      header: null
+  textInput: {
+      margin: 15,
+      height: 30,
+      width: 200,
+      borderWidth: 1,
+      fontSize: 20,
+   },  list: {
+    paddingHorizontal: 20,
+  },  
+  listItem: {
+    backgroundColor: '#EEE',
+    marginTop: 20,
+    padding: 30,
+  },
+  input: {
+    height: 50,
+    borderBottomWidth: 2,
+    borderBottomColor: '#2196F3',
+    margin: 10,
   }
- 
-},
-
-
-}, {
-    initialRouteName: 'AddressScreen',
-}
-
-
-
-);
-
-export default createAppContainer(AppNavigator);
+   
+});

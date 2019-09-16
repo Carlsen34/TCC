@@ -168,9 +168,13 @@ class AddressScreen extends React.Component {
         const { navigation } = this.props;
         const origin = navigation.getParam('origin', '');
         const waypoints = navigation.getParam('waypoints', '');
-
-        console.log(origin)
-        console.log(waypoints)
+        this.setState({
+          originText:origin,
+          waypointsText:waypoints
+        })
+        console.log(this.state.originText)
+        console.log(this.state.waypointsText)
+        this.handleButton()
 
       }
 
@@ -384,12 +388,7 @@ handleGetGoogleMapDirections = async () => {
                 <Text>Press to Get Direction</Text>
               </MapView.Callout>
             </MapView.Marker>
-{/* 
-            <MapView.Marker
-              coordinate={this.state.waypoints}
-            >
-            </MapView.Marker> */}
-
+            
             <MapView.Marker
               coordinate={this.state.origin}
             >
@@ -414,23 +413,6 @@ handleGetGoogleMapDirections = async () => {
             submitInput={ (inputText) => {this.sendInput(inputText)} }
             closeDialog={ () => { this.setState({isDialogVisible:false})}}>
           </DialogInput>
-
-              <TextInput
-                  onChangeText={text => this.onChangeText('originText', text+'|')}
-                  style={styles.input}
-                  placeholder="Origin"
-              />
-                <TextInput
-                  onChangeText={text => this.onChangeText('waypointsText', text+'|')}
-                  style={styles.input}
-                  placeholder="Waypoints"
-                  />
-
-                <TouchableOpacity style={styles.button} onPress={this.handleButton}>
-
-                    <Text style={styles.buttonText}>Search Route</Text>
-
-                </TouchableOpacity>
 
                 <TouchableOpacity style={styles.button} onPress={this.saveButton}>
 

@@ -58,10 +58,10 @@ async auxFriend(){
 }
 
 
-async auxDeleteUser(){
+async auxDeleteUser(deleteUser){
   this.setState({animating:true})
   var user =  Auth.user.username;
-  var newFriend =  this.state.NewFriend;
+  var newFriend =  deleteUser;
   await this.deleteUser(user,newFriend);
   await this.deleteUser(newFriend,user)
   await this.getUser(user);
@@ -211,10 +211,7 @@ render(){
        onPress={this.auxFriend.bind(this)} 
        />
        <Text></Text>
-      <Button 
-      title="Delete Friend"
-       onPress={this.auxDeleteUser.bind(this)}  
-       /> 
+
       <ActivityIndicator
         size="large" 
         color="#0000ff" 
@@ -231,10 +228,7 @@ render(){
        onPress={this.auxFriend.bind(this)} 
        />
        <Text></Text>
-      <Button 
-      title="Delete Friend"
-       onPress={this.auxDeleteUser.bind(this)}  
-       /> 
+
 
       <FlatList
         style={{ marginTop: 15 }}
@@ -249,6 +243,9 @@ render(){
           })
           }}>
         <Text>{item}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress ={() => this.auxDeleteUser(item)} >
+            <Text>X</Text>
           </TouchableOpacity>
       </View>
       }

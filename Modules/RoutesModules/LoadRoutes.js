@@ -113,10 +113,10 @@ export default class App extends React.Component {
     this.setState({animating:false})
   }
 
-  async auxdeleteRoutes(){
+  async auxdeleteRoutes(deleteRoutes){
     this.setState({animating:true})
     await this.getRoutes(Auth.user.username);
-   this.deleteRoutes();
+   this.deleteRoutes(deleteRoutes);
     this.setState({animating:true})
 
 
@@ -124,7 +124,7 @@ export default class App extends React.Component {
   }
 
 
-  async deleteRoutes(){
+  async deleteRoutes(deleteRoutes){
     let Obj =  {
       body: await{
         "user":Auth.user.username,
@@ -132,7 +132,7 @@ export default class App extends React.Component {
       }
     }
 
-    var indice =  await Obj.body.routeName.indexOf(this.state.routeName);
+    var indice =  await Obj.body.routeName.indexOf(deleteRoutes);
     if(indice == -1){
       console.log("Cant unfriend");
       return
@@ -155,7 +155,7 @@ export default class App extends React.Component {
 
 
       try {
-        const apiResponse = await API.del("Routes", "/routes/object/" + this.state.routeName);
+        const apiResponse = await API.del("Routes", "/routes/object/" + deleteRoutes);
         console.log("response from deleteing route: " + apiResponse);
         this.setState({apiResponse});
       } catch (e) {
@@ -320,9 +320,6 @@ render(){
      onPress={this.auxgetRoutes.bind(this)}  
      /> 
     <Text></Text>
-   <Button 
-    title="Delete Routes"
-     onPress={this.auxdeleteRoutes.bind(this)} /> 
     <Text></Text>
 
     <Button 
@@ -345,6 +342,9 @@ render(){
         <TouchableOpacity onPress={() =>this.openRoute(item)}>
       <Text>{item}</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress ={() => this.auxdeleteRoutes(item)} >
+            <Text>X</Text>
+          </TouchableOpacity>
     </View>
     }
       keyExtractor={(item, index) => index.toString()}

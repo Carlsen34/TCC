@@ -272,6 +272,7 @@ class ConclusionScreen extends React.Component {
     const max_dist = navigation.getParam('max_dist', '');
     const route = navigation.getParam('route', '');
 
+
   return(
 <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
   <Text>Name :{vehicles}</Text>
@@ -279,6 +280,20 @@ class ConclusionScreen extends React.Component {
   <Text>Dist :{dist}</Text>
   <Text>Max dist :{max_dist}</Text>
   <Text>Route :{route}</Text>
+  <FlatList
+            style={{ marginTop: 30 }}
+            contentContainerStyle={styles.list}
+            data={route} 
+            renderItem = {({item}) =>
+            <View style={styles.listItem}>
+            <Text>
+            {item} 
+            </Text>
+          </View>
+          }
+            keyExtractor={(item, index) => index.toString()}
+          />
+
   <Button 
   title="Share Route"
   onPress={() =>this.handleButton(vehicles,index_vehicles,dist,max_dist,route)}/>
