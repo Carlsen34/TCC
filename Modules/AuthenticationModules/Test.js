@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity} from 'react-native';
+import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity,Image,TouchableHighlight} from 'react-native';
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
 
@@ -240,10 +240,16 @@ render(){
               name: item,
           })
           }}>
-        <Text>{item}</Text>
+        <Text style={styles.format}>{item}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress ={() => this.auxDeleteUser(item)} >
-            <Text>X</Text>
+          <View>
+          <Image
+              source={require("../../images/cross.jpg")}
+              style={styles.float}
+
+            />
+          </View>
           </TouchableOpacity>
 
       </View>
@@ -278,9 +284,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },  
   listItem: {
-    backgroundColor: '#EEE',
-    marginTop: 20,
+    backgroundColor: '#f0f8ff',
     padding: 30,
+    justifyContent: 'center',
+
+  },
+  format:{
+    fontSize: 15,
+  },
+  float:{
+    marginTop:-20,
+    alignSelf: 'flex-end',
+    height: 25, 
+    width: 25
+
   },
   input: {
     height: 50,

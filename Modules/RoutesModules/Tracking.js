@@ -187,7 +187,7 @@ componentDidMount() {
             coordinate={this.state.trackingSpot}
           >
             <Image
-              source={require("./car.png")}
+              source={require("../../images/car.png")}
               style={{ height: 35, width: 35 }}
             />
           </Marker.Animated>
