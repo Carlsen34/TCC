@@ -247,10 +247,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },  
   listItem: {
-    backgroundColor: '#EEE',
-    marginTop: 20,
+    backgroundColor: '#f0f8ff',
+    marginTop: 5,
     padding: 30,
   },
+  
   input: {
     height: 50,
     borderBottomWidth: 2,

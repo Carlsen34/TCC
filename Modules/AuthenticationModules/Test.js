@@ -286,6 +286,7 @@ const styles = StyleSheet.create({
   listItem: {
     backgroundColor: '#f0f8ff',
     padding: 30,
+    marginTop: 5,
     justifyContent: 'center',
 
   },

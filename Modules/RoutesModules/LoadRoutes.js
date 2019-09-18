@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity,TouchableHighlight} from 'react-native';
+import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity,TouchableHighlight,Image} from 'react-native';
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
 import DialogInput from 'react-native-dialog-input';
@@ -32,7 +32,8 @@ export default class App extends React.Component {
     latitude:"",
     longitude:"",
     value:1,
-    onRide:false
+    onRide:false,
+    Image,
 
   };
 
@@ -315,12 +316,12 @@ render(){
 
   return(
     <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-   <Button 
+   {/* <Button 
     title="List Routes"
      onPress={this.auxgetRoutes.bind(this)}  
      /> 
     <Text></Text>
-    <Text></Text>
+    <Text></Text> */}
 
     <Button 
     
@@ -340,10 +341,16 @@ render(){
       renderItem = {({item}) =>
       <View style={styles.listItem}>
         <TouchableOpacity onPress={() =>this.openRoute(item)}>
-      <Text>{item}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress ={() => this.auxdeleteRoutes(item)} >
-            <Text>X</Text>
+        <Text style={styles.format}>{item}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress ={() => this.auxdeleteRoutes(item)} >
+          <View>
+          <Image
+              source={require("../../images/cross.jpg")}
+              style={styles.float}
+
+            />
+          </View>
           </TouchableOpacity>
     </View>
     }
@@ -375,8 +382,8 @@ textInput: {
   paddingHorizontal: 20,
 },  
 listItem: {
-  backgroundColor: '#EEE',
-  marginTop: 20,
+  backgroundColor: '#f0f8ff',
+  marginTop: 5,
   padding: 30,
 },
 input: {
@@ -384,6 +391,16 @@ input: {
   borderBottomWidth: 2,
   borderBottomColor: '#2196F3',
   margin: 10,
+},
+format:{
+  fontSize: 15,
+},
+float:{
+  marginTop:-20,
+  alignSelf: 'flex-end',
+  height: 25, 
+  width: 25
+
 }
  
 });
