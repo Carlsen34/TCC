@@ -167,25 +167,34 @@ const styles = StyleSheet.create({
     
     },
     textInput: {
-        margin: 15,
-        height: 30,
-        width: 200,
-        borderWidth: 1,
-        fontSize: 20,
-     },  list: {
-      paddingHorizontal: 20,
-    },  
-    listItem: {
-      backgroundColor: '#EEE',
-      marginTop: 20,
-      padding: 30,
-    },
-    input: {
-      height: 50,
-      borderBottomWidth: 2,
-      borderBottomColor: '#2196F3',
-      margin: 10,
-    }
-     
+      margin: 15,
+      height: 30,
+      width: 200,
+      borderWidth: 1,
+      fontSize: 20,
+   },  list: {
+    paddingHorizontal: 20,
+  },  
+  listItem: {
+    backgroundColor: '#f0f8ff',
+    marginTop: 5,
+    padding: 30,
+  },
+  format:{
+    fontSize: 15,
+  },
+  float:{
+    marginTop:-20,
+    alignSelf: 'flex-end',
+    height: 25, 
+    width: 25
+
+  },
+  input: {
+    height: 50,
+    borderBottomWidth: 2,
+    borderBottomColor: '#2196F3',
+    margin: 10,
+  }
     });
     

@@ -2,6 +2,8 @@ import React from 'react';
 import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity,Image} from 'react-native';
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
+import DialogInput from 'react-native-dialog-input';    
+
 
 var AWS = require('aws-sdk');
 Amplify.configure(AWSConfig);
@@ -31,7 +33,8 @@ export default class ListUsers extends React.Component {
     Friends:'',
     NewFriend:'',
     hasFriend:false,
-    animating:true
+    animating:true,
+    isDialogVisible:false
   };
 
   handleChangeUser = (event) => {
@@ -46,15 +49,15 @@ async auxgetUser(){
   this.setState({animating:false})
 }
 
-async auxFriend(){
+async auxFriend(friend){
   this.setState({animating:true})
   var user =  Auth.user.username;
-  var newFriend =  this.state.NewFriend;
-  await this.newFriend(user,newFriend);
-  await this.newFriend(newFriend,user)
+  await this.newFriend(user,friend);
+  await this.newFriend(friend,user)
   await this.getUser(user);
   this.setState({animating:false})
   alert('Friendship added successfully');
+  this.setState({isDialogVisible:false})
 }
 
 
@@ -197,7 +200,9 @@ async  deleteUser(user,newFriends) {
 
  }
 
-
+ saveButton = () => {
+  this.setState({isDialogVisible:true})
+}
 
 componentWillMount(){
    this.auxgetUser();
@@ -226,10 +231,9 @@ render(){
       <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
       <Button 
       title="New Friend"
-       onPress={this.auxFriend.bind(this)} 
+       onPress={this.saveButton.bind(this)} 
        />
        <Text></Text>
-
 
       <FlatList
         style={{ marginTop: 15 }}
@@ -259,7 +263,14 @@ render(){
         keyExtractor={(item, index) => index.toString()}
       />
 
-      <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
+<DialogInput isDialogVisible={this.state.isDialogVisible}
+            title={"Friend Name"}
+            message={"Enter your friend name"}
+            hintInput ={"Enter your friend name"}
+            submitInput={ (inputText) => {this.auxFriend(inputText)} }
+            closeDialog={ () => { this.setState({isDialogVisible:false})}}>
+          </DialogInput>
+
 </KeyboardAvoidingView>
     )
   }
