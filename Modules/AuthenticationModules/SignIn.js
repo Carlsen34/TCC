@@ -31,7 +31,7 @@ export default class App extends React.Component {
         
       })
       .catch(err => {
-        alert('error signing in!: '+ err.message);
+        alert('Erro em Conectar!: '+ err.message);
         console.log('error signing in!: ', err);
       });
       
@@ -46,16 +46,16 @@ export default class App extends React.Component {
         <TextInput
           onChangeText={value => this.onChangeText('username', value)}
           style={styles.input}
-          placeholder="username"
+          placeholder="Usuario"
         />
       
         <TextInput
           onChangeText={value => this.onChangeText('password', value)}
           style={styles.input}
           secureTextEntry={true}
-          placeholder="password"
+          placeholder="Senha"
         />
-      <Button title="Sign In" onPress={this.signIn.bind(this)} />    
+      <Button title="Conectar" onPress={this.signIn.bind(this)} />    
       </KeyboardAvoidingView>
     );
   }

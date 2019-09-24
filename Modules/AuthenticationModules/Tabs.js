@@ -2,8 +2,8 @@
 import { Platform } from 'react-native';
 import { createAppContainer, createBottomTabNavigator } from 'react-navigation';
 
-import SignIn from './SignIn';
-import SignUp from './SignUp';
+import Conectar from './SignIn';
+import Cadastrar from './SignUp';
 import test from './Test';
 
 
@@ -15,8 +15,8 @@ const createApp = Platform.select({
 export default createApp(
   createBottomTabNavigator(
     {
-      SignIn,
-      SignUp,
+      Conectar,
+      Cadastrar,
       test
       
     },

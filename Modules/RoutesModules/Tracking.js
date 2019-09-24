@@ -1,10 +1,11 @@
 
 import React from "react";
-import {StyleSheet,View, Text,Image, Button,TextInput,KeyboardAvoidingView,FlatList,TouchableOpacity } from 'react-native';
+import {StyleSheet,View, Text,Image,RefreshControl,KeyboardAvoidingView,FlatList,TouchableOpacity } from 'react-native';
 import { createAppContainer, createStackNavigator, StackActions, NavigationActions } from 'react-navigation'; 
 import MapView, { Marker,AnimatedRegion,Polyline,PROVIDER_GOOGLE} from "react-native-maps";
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
+console.ignoredYellowBox = ['Warning: Each', 'Warning: Failed'];
 
 
 const LATITUDE_DELTA = 0.009;
@@ -15,7 +16,8 @@ const LONGITUDE = -122.4324;
 class AnimatedMarkers extends React.Component {
   state = {
     Friends:'',
-    vehicles: []
+    vehicles: [],
+    refreshing:true
   };
 
 
@@ -60,16 +62,31 @@ async getUser(name) {
 
 componentWillMount(){
         this.auxgetUser();
+        this.setState({refreshing:false})
  }
+
+
+ onRefresh() {
+  this.auxgetUser();
+  this.setState({refreshing:false})
+}
 
   render() {
     const { navigation } = this.props;
     const route = navigation.getParam('route', '');
 
-    
+
+    if (this.state.refreshing) {
+      return (
+        //loading view while data is loading
+        <View style={{ flex: 1, paddingTop: 20 }}>
+          <ActivityIndicator />
+        </View>
+      );
+    }
     return (
 <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
- <Text>TRACKING ROUTE</Text>
+ <Text>Rastreamento de Rota</Text>
       <FlatList
       style={{ marginTop: 30 }}
       contentContainerStyle={styles.list}
@@ -82,6 +99,12 @@ componentWillMount(){
     </View>
     }
       keyExtractor={(item, index) => index.toString()}
+      refreshControl={
+        <RefreshControl
+           refreshing={this.state.refreshing}
+          onRefresh={this.onRefresh.bind(this)}
+        />
+      }
     />
   <Text>{this.state.vehicles}</Text>
 </KeyboardAvoidingView>

@@ -1,310 +1,105 @@
-import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity,Image,TouchableHighlight} from 'react-native';
-import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
-import AWSConfig from '../../aws-exports';
 
-var AWS = require('aws-sdk');
-Amplify.configure(AWSConfig);
-
-Analytics.disable();
-
-AWS.config.update({
-    credentials: new AWS.CognitoIdentityCredentials({
-      IdentityPoolId: AWSConfig.aws_cognito_identity_pool_id
-    }),
-    region: AWSConfig.aws_project_region
-  });
-
-const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
-
- var params = {
-  UserPoolId: AWSConfig.aws_user_pools_id,
-  AttributesToGet:[],
- }
-
-export default class ListUsers extends React.Component {
-  
-
-  state = {
-    apiResponse: null,
-    Users: '',
-    Friends:'',
-    NewFriend:'',
-    hasFriend:false,
-    animating:true
+//This is an example code for React Native Swipe Down  to Refresh ListView Using RefreshControl//
+import React, { Component } from 'react';
+//import react in our code.
+ 
+import {
+  StyleSheet,
+  ActivityIndicator,
+  FlatList,
+  Text,
+  View,
+  Alert,
+  RefreshControl,
+} from 'react-native';
+//import all the components we are going to use.
+ 
+export default class Project extends Component {
+  constructor(props) {
+    super(props);
+    //True to show the loader
+    this.state = { refreshing: true };
+    //Running the getData Service for the first time
+    this.GetData();
+  }
+ 
+  GetData = () => {
+    //Service to get the data from the server to render
+    return fetch('https://jsonplaceholder.typicode.com/posts')
+      .then(response => response.json())
+      .then(responseJson => {
+        this.setState({
+          refreshing: false,
+          //Setting the data source for the list to render
+          dataSource: responseJson
+        });
+      })
+      .catch(error => {
+        console.error(error);
+      });
   };
-
-  handleChangeUser = (event) => {
-    this.setState({NewFriend: event});
-}
-
-
-async auxgetUser(){
-  this.setState({animating:true})
-  var user = "edmar";
-   this.getUser(user);
-  this.setState({animating:false})
-}
-
-async auxFriend(){
-  this.setState({animating:true})
-  var user =  "edmar";
-  var newFriend =  this.state.NewFriend;
-  await this.newFriend(user,newFriend);
-  await this.newFriend(newFriend,user)
-  await this.getUser(user);
-  this.setState({animating:false})
-  alert('Friendship added successfully');
-}
-
-
-async auxDeleteUser(friend){
-  console.log(friend)
-  this.setState({animating:true})
-  var user =  "edmar";
-  var newFriend =  friend;
-  await this.deleteUser(user,newFriend);
-  await this.deleteUser(newFriend,user)
-  await this.getUser(user);
-  this.setState({animating:false})
-  alert('Friendship successfully disbanded!');
-
-
-}
-
-
-
-
-async getUser(name) {
-  console.log(name);
-  const path = "/friendship/object/" + name;
-  try {
-    const apiResponse = await API.get("Friendship", path);
-    console.log("response from getting note: " + apiResponse.Friends);
-    this.setState({apiResponse});
-    if(apiResponse.Friends != undefined ){
-      this.setState({Friends:apiResponse.Friends});
-      this.setState({hasFriend:true});
-      console.log("List Friends: " + this.state.Friends);
-    }else{
-      this.setState({hasFriend:false});
-
-    }
-  
-    return apiResponse;
-  } catch (e) {
-    console.log(e);
-  }
-}
-
-
-async  deleteUser(user,newFriends) {
-  await  this.getUser(user);
-  var friends = await this.state.Friends;
-  await cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
-  if (err) console.log("ERROR "+err, err.stack); // an error occurred
-  else{
-    for(var resp in data.Users){
-      var objUsername = data.Users[resp].Username;
-      var objUserStatus = data.Users[resp].UserStatus;
-
-      if(newFriends == objUsername && objUserStatus == "CONFIRMED" ){
-        let objNewFriend = {
-          body: {
-            "Users": user,
-            "Friends":friends
-          }
-        }
-
-        var indice = objNewFriend.body.Friends.indexOf(newFriends);
-        if(indice == -1){
-          console.log("Cant unfriend");
-        } else{
-          objNewFriend.body.Friends.splice(indice,1);
-          const path = "/friendship";
-      
-          // Use the API module to save the note to the database
-          try {
-            const apiResponse =  API.put("Friendship", path, objNewFriend)
-            console.log("response from saving note: " + apiResponse);
-            this.setState({apiResponse});
-            return apiResponse;
-          } catch (e) {
-         
-            console.log(e);
-          }
-        }
-      }
-    }
-  } ;           // successful response
-});
-
-}
-
-
-
- async  newFriend(user,newFriends) {
-    await  this.getUser(user);
-    var friends = await this.state.Friends;
-    var hasFriend = await this.state.hasFriend;
-
-    await cognitoIdentityServiceProvider.listUsers(params, function(err, data) {
-    if (err) console.log("ERROR "+err, err.stack); // an error occurred
-    else{
-      for(var resp in data.Users){
-        var objUsername = data.Users[resp].Username;
-        var objUserStatus = data.Users[resp].UserStatus;
-       
-        if(objUsername != user && newFriends == objUsername && objUserStatus == "CONFIRMED" ){
-          let objNewFriend = {
-            body: {
-              "Users": user,
-              "Friends":friends
-            }
-          }
-
-          if(hasFriend == true){
-            for(var resp in  objNewFriend.body.Friends){
-              if(objNewFriend.body.Friends[resp] == newFriends ){
-                return
-              }
-            }
-            objNewFriend.body.Friends.push(newFriends);
-          }else{
-            objNewFriend.body.Friends = [newFriends];
-          }
-         
-          const path = "/friendship";
-        
-          // Use the API module to save the note to the database
-          try {
-            const apiResponse =  API.put("Friendship", path, objNewFriend)
-            console.log(path)
-            console.log(objNewFriend)
-            console.log("response from saving note: " + apiResponse);
-            this.setState({apiResponse});
-            return apiResponse;
-          } catch (e) {
-            console.log(e);
-          }
-
-        }else{
-          console.log("Impossivel adicionar amigo");
-        }
-      }
-    } ;           
-  });
-
- }
-
-
-componentWillMount(){
-   this.auxgetUser();
-  }
-
-render(){
-    if(this.state.animating){
-      return ( 
-     <KeyboardAvoidingView style={styles.container} behavior="padding" enabled> 
-       <Button 
-      title="New Friend"
-       onPress={this.auxFriend.bind(this)} 
-       />
-       <Text></Text>
-      <ActivityIndicator
-        size="large" 
-        color="#0000ff" 
-        animating = {this.state.animating}/>
-
-        </KeyboardAvoidingView>
-        )
-    }
-    if(!this.state.animating){
-    return(
-      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-      <Button 
-      title="New Friend"
-       onPress={this.auxFriend.bind(this)} 
-       />
-       <Text></Text>
-
-      <FlatList
-        style={{ marginTop: 15 }}
-        contentContainerStyle={styles.list}
-        data={this.state.Friends}
-        renderItem = {({item}) =>
-        <View style={styles.listItem}>
-          <TouchableOpacity  onPress={() => {
-            this.props.navigation.navigate('UserProfile', {
-              itemId: 86,
-              name: item,
-          })
-          }}>
-        <Text style={styles.format}>{item}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress ={() => this.auxDeleteUser(item)} >
-          <View>
-          <Image
-              source={require("../../images/cross.jpg")}
-              style={styles.float}
-
-            />
-          </View>
-          </TouchableOpacity>
-
-      </View>
-      
-      }
-        keyExtractor={(item, index) => index.toString()}
+  ListViewItemSeparator = () => {
+    return (
+      //returning the listview item saparator view
+      <View
+        style={{
+          height: 0.2,
+          width: '90%',
+          backgroundColor: '#808080',
+        }}
       />
-
-      <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
-</KeyboardAvoidingView>
-    )
+    );
+  };
+  onRefresh() {
+    //Clear old data of the list
+    this.setState({ dataSource: [] });
+    //Call the Service to get the latest data
+    this.GetData();
+  }
+  render() {
+    if (this.state.refreshing) {
+      return (
+        //loading view while data is loading
+        <View style={{ flex: 1, paddingTop: 20 }}>
+          <ActivityIndicator />
+        </View>
+      );
+    }
+    return (
+      //Returning the ListView
+      <View style={styles.MainContainer}>
+        <FlatList
+          data={this.state.dataSource}
+          keyExtractor={(item, index) => index.toString()}
+          ItemSeparatorComponent={this.ListViewItemSeparator}
+          enableEmptySections={true}
+          renderItem={({item}) => (
+            <Text
+              style={styles.rowViewContainer}
+              onPress={() => alert(item.id)}>
+              {item.title}
+            </Text>
+          )}
+          refreshControl={
+            <RefreshControl
+              //refresh control used for the Pull to Refresh
+              refreshing={this.state.refreshing}
+              onRefresh={this.onRefresh.bind(this)}
+            />
+          }
+        />
+      </View>
+    );
   }
 }
-};
-
-
 const styles = StyleSheet.create({
-  container: {
-    margin: 30,
-    flex: 5,
-    backgroundColor: '#fff',
-    padding: 16,
-
-  },
-  textInput: {
-      margin: 15,
-      height: 30,
-      width: 200,
-      borderWidth: 1,
-      fontSize: 20,
-   },  list: {
-    paddingHorizontal: 20,
-  },  
-  listItem: {
-    backgroundColor: '#f0f8ff',
-    padding: 30,
-    marginTop: 5,
+  MainContainer: {
     justifyContent: 'center',
-
+    flex: 1,
+    marginTop: 10,
   },
-  format:{
-    fontSize: 15,
+  rowViewContainer: {
+    fontSize: 20,
+    padding: 10,
   },
-  float:{
-    marginTop:-20,
-    alignSelf: 'flex-end',
-    height: 25, 
-    width: 25
-
-  },
-  input: {
-    height: 50,
-    borderBottomWidth: 2,
-    borderBottomColor: '#2196F3',
-    margin: 10,
-  }
-   
 });

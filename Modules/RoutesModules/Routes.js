@@ -29,6 +29,7 @@ const backgroundColor = '#007256';
 
 const { height, width } = Dimensions.get('window');
 
+console.ignoredYellowBox = ['Warning: Each', 'Warning: Failed'];
 
 
 class AddressScreen extends React.Component {
@@ -61,20 +62,21 @@ class AddressScreen extends React.Component {
 
    return (
   <KeyboardAvoidingView style={styles1.container} behavior="padding">
+       <Text>Rota Unica</Text>
 
        <TextInput
          onChangeText={value => this.onChangeText('originText', value+'|')}
          style={styles1.input}
-         placeholder="originText"
+         placeholder="Origem"
        />
 
       <TextInput
          onChangeText={value => this.onChangeText('waypointsText', value)}
          style={styles1.input}
-         placeholder="waypointsText"
+         placeholder="Pontos de Parada"
        />
      
-     <Button title="Create Route" onPress={this.saveButton.bind(this)} />    
+     <Button title="Criar Rota" onPress={this.saveButton.bind(this)} />    
      </KeyboardAvoidingView>
    );
  }  
@@ -359,6 +361,8 @@ handleGetGoogleMapDirections = async () => {
 };
 
     render() {
+      console.ignoredYellowBox = ['Warning: Each', 'Warning: Failed'];
+
         return(
 
             <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
@@ -407,9 +411,9 @@ handleGetGoogleMapDirections = async () => {
             </MapView>
 
             <DialogInput isDialogVisible={this.state.isDialogVisible}
-            title={"Route Name"}
-            message={"Enter your route name"}
-            hintInput ={"Enter your route name"}
+            title={"Nome da Rota"}
+            message={"Digite o nome da Rota"}
+            hintInput ={"Digite o nome da Rota"}
             submitInput={ (inputText) => {this.sendInput(inputText)} }
             closeDialog={ () => { this.setState({isDialogVisible:false})}}>
           </DialogInput>

@@ -117,7 +117,7 @@ export default class UserProfile extends React.Component {
 
         await this.saveRoutes("getRoute","/getRoute",objRoutesAux);
         this.auxgetRoutes();
-        alert('Route shared successfully ');
+        alert('Rota compartilhada com Sucesso');
       };
 
        

@@ -2,11 +2,10 @@
 import { Platform } from 'react-native';
 import { createAppContainer, createBottomTabNavigator } from 'react-navigation';
 
-import Contatos from './RelashionshipModules/ListUserRoutes';
 
-import Criar from './RoutesModules/RoutesTab';
-import Carregar from './RoutesModules/LoadRoutes';
-import Rastreamento from './RoutesModules/Tracking';
+import Compartilhada from './CreateRoutes';
+import Unica from './Routes';
+
 
 
 const createApp = Platform.select({
@@ -16,10 +15,9 @@ const createApp = Platform.select({
 export default createApp(
   createBottomTabNavigator(
     {
-      Contatos,
-      Criar,
-      Carregar,
-      Rastreamento,
+      Compartilhada,
+      Unica,
+
     },
     {
       tabBarOptions: {

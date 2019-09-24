@@ -11,6 +11,7 @@ export default class App extends React.Component {
     password: '',
     email: '',
     confirmationCode: '',
+    isSucessfulSingUp:false,
   };
   onChangeText(key, value) {
     this.setState({
@@ -26,8 +27,9 @@ export default class App extends React.Component {
       },
     })
       .then(() => {
-        alert('successful sign up!');
+        alert('Cadastro Realizado com Sucesso!');
         console.log('successful sign up!')
+        this.setState({isSucessfulSingUp:true})
       }
       )
       .catch(err => { 
@@ -38,45 +40,57 @@ export default class App extends React.Component {
   confirmSignUp() {
     Auth.confirmSignUp(this.state.username, this.state.confirmationCode)
       .then(() => {
-        alert('successful confirm sign up!');
+        alert('Cadastro Confirmado com Sucesso!');
         console.log('successful confirm sign up!')
       })
       .catch(err => {
-        alert('error confirming signing up!: '+ err.message);
+        alert('Erro ao Confirmar Cadastro!: '+ err.message);
         console.log('error confirming signing up!: ', err)
     });
   }
   render() {
-    return (
+    if(!this.state.isSucessfulSingUp){
+      return(
       <KeyboardAvoidingView style={styles.container} behavior="padding">
-        <TextInput
-          onChangeText={value => this.onChangeText('username', value)}
-          style={styles.input}
-          placeholder="username"
-        />
-        <TextInput
-          onChangeText={value => this.onChangeText('password', value)}
-          style={styles.input}
-          secureTextEntry={true}
-          placeholder="password"
-        />
-        <TextInput
-          onChangeText={value => this.onChangeText('email', value)}
-          style={styles.input}
-          placeholder="email"
-        />
-        <Button title="Sign Up" onPress={this.signUp.bind(this)} />
-        <TextInput
-          onChangeText={value => this.onChangeText('confirmationCode', value)}
-          style={styles.input}
-          placeholder="confirmation Code"
-        />
-        <Button
-          title="Confirm Sign Up"
-          onPress={this.confirmSignUp.bind(this)}
-        />
-      </KeyboardAvoidingView>
-    );
+      <TextInput
+        onChangeText={value => this.onChangeText('username', value)}
+        style={styles.input}
+        placeholder="Usuario"
+      />
+      <TextInput
+        onChangeText={value => this.onChangeText('password', value)}
+        style={styles.input}
+        secureTextEntry={true}
+        placeholder="Senha"
+      />
+      <TextInput
+        onChangeText={value => this.onChangeText('email', value)}
+        style={styles.input}
+        placeholder="Email"
+      />
+       <Button title="Cadastrar" onPress={this.signUp.bind(this)} />
+       </KeyboardAvoidingView>
+      )}
+    else{
+
+      return (
+        <KeyboardAvoidingView style={styles.container} behavior="padding">
+  
+         
+          <TextInput
+            onChangeText={value => this.onChangeText('confirmationCode', value)}
+            style={styles.input}
+            placeholder="Codigo de Confirmação"
+          />
+          <Button
+            title="Confirmar Cadastro"
+            onPress={this.confirmSignUp.bind(this)}
+          />
+        </KeyboardAvoidingView>
+      );
+
+    }
+
   }
 }
 

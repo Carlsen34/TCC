@@ -2,6 +2,7 @@ import React from 'react';
 import {StyleSheet,View, Text, Button,TextInput,KeyboardAvoidingView,FlatList,TouchableOpacity } from 'react-native';
 import { createAppContainer, createStackNavigator, StackActions, NavigationActions } from 'react-navigation'; 
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
+console.ignoredYellowBox = ['Warning: Each', 'Warning: Failed'];
 
 const routeAPI = 'http://vrp-dev.us-east-1.elasticbeanstalk.com/api/v1/vrp/route=';
 
@@ -9,10 +10,12 @@ class AddressScreen extends React.Component {
 
    state = {
         originText: '',
-        waypointsText:''
+        waypointsText:'',
+
       };
 
     onChangeText(key, value) {
+ 
     var str = value.split(" ").join("+");
     this.setState({
       [key]: str,
@@ -24,7 +27,7 @@ class AddressScreen extends React.Component {
   
          /* 1. Navigate to the Details route with params */
             this.props.navigation.navigate('VehiclesScreen', {
-              route:originText+waypointsText
+              route:originText+waypointsText,
             })
     }
 
@@ -34,20 +37,21 @@ class AddressScreen extends React.Component {
  
     return (
    <KeyboardAvoidingView style={styles.container} behavior="padding">
+        <Text>Rota Compartilhada</Text>
 
         <TextInput
           onChangeText={value => this.onChangeText('originText', value+'|')}
           style={styles.input}
-          placeholder="originText"
+          placeholder="Origem"
         />
 
        <TextInput
           onChangeText={value => this.onChangeText('waypointsText', value)}
           style={styles.input}
-          placeholder="waypointsText"
+          placeholder="Pontos de Parada"
         />
       
-      <Button title="Create Route" onPress={this.saveButton.bind(this)} />    
+      <Button title="Criar Rota" onPress={this.saveButton.bind(this)} />    
       </KeyboardAvoidingView>
     );
   }  
@@ -76,7 +80,10 @@ addVehicle = (item) => {
 
 completeRoute = (fullAPI) => {
   const {vehicles} = this.state;
+  const { navigation } = this.props;
   fetch(fullAPI).then(response => response.json()).then(data => {
+
+
   this.props.navigation.navigate('ConclusionScreen', {
     dist:data.Distance_of_the_route,
     max_dist:data.Maximum_of_the_route_distances,
@@ -132,7 +139,6 @@ componentWillMount(){
     
     return (
 <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
- <Text>{fullAPI}</Text>
       <FlatList
       style={{ marginTop: 30 }}
       contentContainerStyle={styles.list}
@@ -147,7 +153,7 @@ componentWillMount(){
       keyExtractor={(item, index) => index.toString()}
     />
   <Text>{this.state.vehicles}</Text>
-<Button onPress={() =>this.completeRoute(fullAPI)} title="CREATE ROUTE"/>  
+<Button onPress={() =>this.completeRoute(fullAPI)} title="CRIAR ROTA"/>  
 </KeyboardAvoidingView>
     );
   }
@@ -164,7 +170,8 @@ class ConclusionScreen extends React.Component {
     route:[],
     apiResponse:"",
     hasRoute:false,
-    RouteName:""
+    RouteName:"",
+    routeAux:[]
 
   };
 
@@ -257,29 +264,28 @@ class ConclusionScreen extends React.Component {
 
       await this.saveRoutes("getRoute","/getRoute",objRoutesAux);
       await this.getRoutes(user)
-      alert('Route shared successfully ');
+      alert('Rota Compartilhada com Sucesso');
     }
       }
 
 
    }
 
+
+
  render() {
-    const { navigation } = this.props;
-    const vehicles = navigation.getParam('vehicles', '');
-    const index_vehicles = navigation.getParam('num_vehicles', '');
-    const dist = navigation.getParam('dist', '');
-    const max_dist = navigation.getParam('max_dist', '');
-    const route = navigation.getParam('route', '');
+  var { navigation } = this.props;
+  var vehicles = navigation.getParam('vehicles', '');
+  var index_vehicles = navigation.getParam('num_vehicles', '');
+  var dist = navigation.getParam('dist', '');
+  var max_dist = navigation.getParam('max_dist', '');
+  var route = navigation.getParam('route', '');
+
+
 
 
   return(
 <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-  <Text>Name :{vehicles}</Text>
-  <Text>Index Vehicle :{index_vehicles}</Text>
-  <Text>Dist :{dist}</Text>
-  <Text>Max dist :{max_dist}</Text>
-  <Text>Route :{route}</Text>
   <FlatList
             style={{ marginTop: 30 }}
             contentContainerStyle={styles.list}
@@ -287,7 +293,7 @@ class ConclusionScreen extends React.Component {
             renderItem = {({item}) =>
             <View style={styles.listItem}>
             <Text>
-            {item} 
+            {item+" "} 
             </Text>
           </View>
           }
@@ -295,7 +301,7 @@ class ConclusionScreen extends React.Component {
           />
 
   <Button 
-  title="Share Route"
+  title="Compartilhar Rota"
   onPress={() =>this.handleButton(vehicles,index_vehicles,dist,max_dist,route)}/>
   
 

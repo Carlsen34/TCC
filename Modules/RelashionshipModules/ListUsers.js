@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity,Image} from 'react-native';
+import {RefreshControl, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity,Image} from 'react-native';
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
 import DialogInput from 'react-native-dialog-input';    
@@ -33,7 +33,7 @@ export default class ListUsers extends React.Component {
     Friends:'',
     NewFriend:'',
     hasFriend:false,
-    animating:true,
+    refreshing:true,
     isDialogVisible:false
   };
 
@@ -56,7 +56,7 @@ async auxFriend(friend){
   await this.newFriend(friend,user)
   await this.getUser(user);
   this.setState({animating:false})
-  alert('Friendship added successfully');
+  alert('Contato Adicionado com Sucesso');
   this.setState({isDialogVisible:false})
 }
 
@@ -69,7 +69,7 @@ async auxDeleteUser(deleteUser){
   await this.deleteUser(newFriend,user)
   await this.getUser(user);
   this.setState({animating:false})
-  alert('Friendship successfully disbanded!');
+  alert('Contato Removido com Sucesso');
   await this.getUser(user);
 
 
@@ -206,31 +206,28 @@ async  deleteUser(user,newFriends) {
 
 componentWillMount(){
    this.auxgetUser();
+   this.setState({refreshing:false})
+  }
+  onRefresh() {
+    this.auxgetUser();
+    this.setState({refreshing:false})
   }
 
+
 render(){
-    if(this.state.animating){
-      return ( 
-     <KeyboardAvoidingView style={styles.container} behavior="padding" enabled> 
-       <Button 
-      title="New Friend"
-       onPress={this.auxFriend.bind(this)} 
-       />
-       <Text></Text>
+  if (this.state.refreshing) {
+    return (
+      //loading view while data is loading
+      <View style={{ flex: 1, paddingTop: 20 }}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
 
-      <ActivityIndicator
-        size="large" 
-        color="#0000ff" 
-        animating = {this.state.animating}/>
-
-        </KeyboardAvoidingView>
-        )
-    }
-    if(!this.state.animating){
     return(
       <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
       <Button 
-      title="New Friend"
+      title="Adicionar Contato"
        onPress={this.saveButton.bind(this)} 
        />
        <Text></Text>
@@ -261,12 +258,18 @@ render(){
       </View>
       }
         keyExtractor={(item, index) => index.toString()}
+        refreshControl={
+          <RefreshControl
+             refreshing={this.state.refreshing}
+            onRefresh={this.onRefresh.bind(this)}
+          />
+        }
       />
 
 <DialogInput isDialogVisible={this.state.isDialogVisible}
-            title={"Friend Name"}
-            message={"Enter your friend name"}
-            hintInput ={"Enter your friend name"}
+            title={"Nome do Contato"}
+            message={"Digite o nome do Contato"}
+            hintInput ={"Digite o nome do Contato"}
             submitInput={ (inputText) => {this.auxFriend(inputText)} }
             closeDialog={ () => { this.setState({isDialogVisible:false})}}>
           </DialogInput>
@@ -274,7 +277,7 @@ render(){
 </KeyboardAvoidingView>
     )
   }
-}
+
 };
 
 

@@ -5,6 +5,7 @@ import Amplify, { Auth,Analytics } from 'aws-amplify';
 import AWSConfig from './aws-exports';
 Amplify.configure(AWSConfig);
 Analytics.disable();
+console.disableYellowBox = true;
 
 
 import Tabs from './Modules/AuthenticationModules/Tabs';

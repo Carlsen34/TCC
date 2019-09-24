@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity,TouchableHighlight,Image} from 'react-native';
+import { TextInput, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity,RefreshControl,Image} from 'react-native';
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 import AWSConfig from '../../aws-exports';
 import DialogInput from 'react-native-dialog-input';
@@ -13,6 +13,7 @@ Amplify.configure(AWSConfig);
 const GOOGLE_MAPS_APIKEY = AWSConfig.GOOGLEAPI;
 const arr = [];
 Analytics.disable();
+console.ignoredYellowBox = ['Warning: Each', 'Warning: Failed'];
 
 
 export default class App extends React.Component {
@@ -34,6 +35,7 @@ export default class App extends React.Component {
     value:1,
     onRide:false,
     Image,
+    refreshing: true,
 
   };
 
@@ -295,12 +297,17 @@ export default class App extends React.Component {
   }
 
 
-
+  onRefresh() {
+    this.auxgetRoutes();
+    this.setState({refreshing:false})
+  }
 
 
  
   componentWillMount(){
     this.auxgetRoutes();
+    this.setState({refreshing:false})
+
    }
 
    handleChangeUser = (event) => {
@@ -313,6 +320,14 @@ actionOnRow(item){
 }
 
 render(){
+  if (this.state.refreshing) {
+    return (
+      //loading view while data is loading
+      <View style={{ flex: 1, paddingTop: 20 }}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
 
   return(
     <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
@@ -338,10 +353,12 @@ render(){
       style={{ marginTop: 30 }}
       contentContainerStyle={styles.list}
       data={this.state.routeNameList}
+
       renderItem = {({item}) =>
       <View style={styles.listItem}>
         <TouchableOpacity onPress={() =>this.openRoute(item)}>
         <Text style={styles.format}>{item}</Text>
+        
           </TouchableOpacity>
           <TouchableOpacity onPress ={() => this.auxdeleteRoutes(item)} >
           <View>
@@ -355,9 +372,13 @@ render(){
     </View>
     }
       keyExtractor={(item, index) => index.toString()}
-    />
-     <TextInput style={styles.textInput} autoCapitalize='none' onChangeText={this.handleChangeUser}/>
-  
+      refreshControl={
+        <RefreshControl
+           refreshing={this.state.refreshing}
+          onRefresh={this.onRefresh.bind(this)}
+        />
+      }
+    />  
 </KeyboardAvoidingView>
   )
 }
