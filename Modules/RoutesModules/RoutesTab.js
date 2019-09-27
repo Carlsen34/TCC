@@ -4,7 +4,7 @@ import { createAppContainer, createBottomTabNavigator } from 'react-navigation';
 
 
 import Compartilhada from './CreateRoutes';
-import Unica from './Routes';
+import Propria from './Routes';
 
 
 
@@ -16,7 +16,7 @@ export default createApp(
   createBottomTabNavigator(
     {
       Compartilhada,
-      Unica,
+      Propria,
 
     },
     {

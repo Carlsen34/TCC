@@ -1,105 +1,206 @@
+import React from 'react';
+import {RefreshControl, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity,Image, Alert} from 'react-native';
+import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
+import AWSConfig from '../../aws-exports';
+import DialogInput from 'react-native-dialog-input';    
 
-//This is an example code for React Native Swipe Down  to Refresh ListView Using RefreshControl//
-import React, { Component } from 'react';
-//import react in our code.
- 
-import {
-  StyleSheet,
-  ActivityIndicator,
-  FlatList,
-  Text,
-  View,
-  Alert,
-  RefreshControl,
-} from 'react-native';
-//import all the components we are going to use.
- 
-export default class Project extends Component {
-  constructor(props) {
-    super(props);
-    //True to show the loader
-    this.state = { refreshing: true };
-    //Running the getData Service for the first time
-    this.GetData();
+
+
+var AWS = require('aws-sdk');
+Amplify.configure(AWSConfig);
+
+Analytics.disable();
+
+AWS.config.update({
+    credentials: new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: AWSConfig.aws_cognito_identity_pool_id
+    }),
+    region: AWSConfig.aws_project_region
+  });
+
+const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider();
+
+ var params = {
+  UserPoolId: AWSConfig.aws_user_pools_id,
+  AttributesToGet:[],
+ }
+
+ var listRoutesAux = [];
+export default class ListUsers extends React.Component {
+  
+
+  state = {
+    apiResponse: null,
+    listRoutes:[],
+    refreshing:true,
+    isDialogVisible:false
+  };
+
+  
+
+
+ saveButton = () => {
+  this.setState({isDialogVisible:true})
+}
+
+componentWillMount(){
+   //this.auxgetUser();
+   this.setState({refreshing:false})
   }
- 
-  GetData = () => {
-    //Service to get the data from the server to render
-    return fetch('https://jsonplaceholder.typicode.com/posts')
-      .then(response => response.json())
-      .then(responseJson => {
-        this.setState({
-          refreshing: false,
-          //Setting the data source for the list to render
-          dataSource: responseJson
-        });
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  };
-  ListViewItemSeparator = () => {
-    return (
-      //returning the listview item saparator view
-      <View
-        style={{
-          height: 0.2,
-          width: '90%',
-          backgroundColor: '#808080',
-        }}
-      />
-    );
-  };
   onRefresh() {
-    //Clear old data of the list
-    this.setState({ dataSource: [] });
-    //Call the Service to get the latest data
-    this.GetData();
+   //this.auxgetUser();
+    this.setState({refreshing:false})
   }
-  render() {
-    if (this.state.refreshing) {
-      return (
-        //loading view while data is loading
-        <View style={{ flex: 1, paddingTop: 20 }}>
-          <ActivityIndicator />
-        </View>
-      );
+
+  async RemoveRoute(route){
+    this.setState({animating:true})
+    var index = listRoutesAux.indexOf(route)
+    if (index !== -1) {
+      await listRoutesAux.splice(index, 1)
+      this.setState({
+        listRoutes: listRoutesAux
+      })
     }
+  }
+
+  async addRoute(addRoute){
+    this.setState({animating:true})
+    await listRoutesAux.push(addRoute)
+    this.setState({
+      listRoutes: listRoutesAux
+    })
+    this.setState({isDialogVisible:false})
+
+
+  }
+
+
+    saveRoute = () => {
+      var routeString = "" 
+      var i 
+      
+      for(i=0;i<this.state.listRoutes.length ;i++){ 
+          if(this.state.listRoutes.length == i+1){
+            routeString = routeString + this.state.listRoutes[i]
+          } 
+          else{
+            routeString = routeString + this.state.listRoutes[i] + "|" 
+          } 
+         
+      }
+      
+      
+      console.log(routeString)
+   
+
+
+  }
+
+
+  
+
+render(){
+  if (this.state.refreshing) {
     return (
-      //Returning the ListView
-      <View style={styles.MainContainer}>
-        <FlatList
-          data={this.state.dataSource}
-          keyExtractor={(item, index) => index.toString()}
-          ItemSeparatorComponent={this.ListViewItemSeparator}
-          enableEmptySections={true}
-          renderItem={({item}) => (
-            <Text
-              style={styles.rowViewContainer}
-              onPress={() => alert(item.id)}>
-              {item.title}
-            </Text>
-          )}
-          refreshControl={
-            <RefreshControl
-              //refresh control used for the Pull to Refresh
-              refreshing={this.state.refreshing}
-              onRefresh={this.onRefresh.bind(this)}
-            />
-          }
-        />
+      //loading view while data is loading
+      <View style={{ flex: 1, paddingTop: 20 }}>
+        <ActivityIndicator />
       </View>
     );
   }
-}
+
+    return(
+      <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
+     <Button 
+     title="Criar Rota" 
+     onPress={this.saveRoute.bind(this)} />    
+      <Text></Text>
+
+      <Button 
+      title="Adicionar Endereço"
+       onPress={this.saveButton.bind(this)} 
+       />
+       <Text></Text>
+
+      <FlatList
+        style={{ marginTop: 15 }}
+        contentContainerStyle={styles.list}
+        data={this.state.listRoutes}
+        renderItem = {({item}) =>
+        <View style={styles.listItem}>
+          <Text style={styles.format}>{item}</Text>
+          <TouchableOpacity onPress ={() => this.RemoveRoute(item)} >
+          <View>
+          <Image
+              source={require("../../images/cross.jpg")}
+              style={styles.float}
+
+            />
+          </View>
+          </TouchableOpacity>
+      </View>
+      }
+        keyExtractor={(item, index) => index.toString()}
+        refreshControl={
+          <RefreshControl
+             refreshing={this.state.refreshing}
+            onRefresh={this.onRefresh.bind(this)}
+          />
+        }
+      />
+
+<DialogInput isDialogVisible={this.state.isDialogVisible}
+            title={"Adicionar Endereço"}
+            message={"Digite o Endereço"}
+            hintInput ={"Digite o Endereço"}
+            submitInput={ (inputText) => {this.addRoute(inputText)} }
+            closeDialog={ () => { this.setState({isDialogVisible:false})}}>
+          </DialogInput>
+
+</KeyboardAvoidingView>
+    )
+  }
+
+};
+
+
 const styles = StyleSheet.create({
-  MainContainer: {
-    justifyContent: 'center',
-    flex: 1,
-    marginTop: 10,
+  container: {
+    margin: 30,
+    flex: 5,
+    backgroundColor: '#fff',
+    padding: 16,
+
   },
-  rowViewContainer: {
-    fontSize: 20,
-    padding: 10,
+  textInput: {
+      margin: 15,
+      height: 30,
+      width: 200,
+      borderWidth: 1,
+      fontSize: 20,
+   },  list: {
+    paddingHorizontal: 20,
+  },  
+  listItem: {
+    backgroundColor: '#f0f8ff',
+    marginTop: 5,
+    padding: 30,
   },
+  format:{
+    fontSize: 15,
+  },
+  float:{
+    marginTop:-20,
+    alignSelf: 'flex-end',
+    height: 25, 
+    width: 25
+
+  },
+  input: {
+    height: 50,
+    borderBottomWidth: 2,
+    borderBottomColor: '#2196F3',
+    margin: 10,
+  }
+   
 });

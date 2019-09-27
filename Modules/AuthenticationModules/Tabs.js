@@ -16,8 +16,7 @@ export default createApp(
   createBottomTabNavigator(
     {
       Conectar,
-      Cadastrar,
-      test
+      Cadastrar
       
     },
     {

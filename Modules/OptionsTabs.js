@@ -6,7 +6,7 @@ import Contatos from './RelashionshipModules/ListUserRoutes';
 
 import Criar from './RoutesModules/RoutesTab';
 import Carregar from './RoutesModules/LoadRoutes';
-import Rastreamento from './RoutesModules/Tracking';
+import Rastrear from './RoutesModules/Tracking';
 
 
 const createApp = Platform.select({
@@ -19,7 +19,7 @@ export default createApp(
       Contatos,
       Criar,
       Carregar,
-      Rastreamento,
+      Rastrear,
     },
     {
       tabBarOptions: {

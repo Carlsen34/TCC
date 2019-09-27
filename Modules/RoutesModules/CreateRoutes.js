@@ -1,60 +1,150 @@
 import React from 'react';
-import {StyleSheet,View, Text, Button,TextInput,KeyboardAvoidingView,FlatList,TouchableOpacity } from 'react-native';
+import {RefreshControl, Button, StyleSheet, Text, View,KeyboardAvoidingView,FlatList,ActivityIndicator,TouchableOpacity,Image, Alert} from 'react-native';
 import { createAppContainer, createStackNavigator, StackActions, NavigationActions } from 'react-navigation'; 
+import DialogInput from 'react-native-dialog-input';    
 import Amplify,{ Auth,API,Analytics} from 'aws-amplify';
 console.ignoredYellowBox = ['Warning: Each', 'Warning: Failed'];
 
 const routeAPI = 'http://vrp-dev.us-east-1.elasticbeanstalk.com/api/v1/vrp/route=';
+var listRoutesAux = [];
 
 class AddressScreen extends React.Component {
 
-   state = {
-        originText: '',
-        waypointsText:'',
 
-      };
 
-    onChangeText(key, value) {
- 
-    var str = value.split(" ").join("+");
-    this.setState({
-      [key]: str,
-    });
-  }
-
-   saveButton = () => {
-      const { originText,waypointsText} = this.state;
+    state = {
+      apiResponse: null,
+      listRoutes:[],
+      refreshing:true,
+      isDialogVisible:false
+    };
   
-         /* 1. Navigate to the Details route with params */
-            this.props.navigation.navigate('VehiclesScreen', {
-              route:originText+waypointsText,
-            })
+    
+  
+  
+   saveButton = () => {
+    this.setState({isDialogVisible:true})
+  }
+  
+  componentWillMount(){
+     //this.auxgetUser();
+     this.setState({refreshing:false})
+    }
+    onRefresh() {
+     //this.auxgetUser();
+      this.setState({refreshing:false})
+    }
+  
+    async RemoveRoute(route){
+      this.setState({animating:true})
+      var index = listRoutesAux.indexOf(route)
+      if (index !== -1) {
+        await listRoutesAux.splice(index, 1)
+        this.setState({
+          listRoutes: listRoutesAux
+        })
+      }
+    }
+  
+    async addRoute(addRoute){
+      this.setState({animating:true})
+      await listRoutesAux.push(addRoute)
+      this.setState({
+        listRoutes: listRoutesAux
+      })
+      this.setState({isDialogVisible:false})
+  
+  
+    }
+  
+  
+      saveRoute = () => {
+        if(this.state.listRoutes.length > 1){
+
+      
+        var routeString = "" 
+        var i 
+        
+        for(i=0;i<this.state.listRoutes.length ;i++){ 
+            if(this.state.listRoutes.length == i+1){
+              routeString = routeString + this.state.listRoutes[i]
+            } 
+            else{
+              routeString = routeString + this.state.listRoutes[i] + "|" 
+            } 
+           
+        }
+        
+        this.props.navigation.navigate('VehiclesScreen', {
+          route:routeString.split(" ").join("+")
+        })
+  
+      }else{
+        alert("Necessita de pelo menos dois Endereço")
+      }
     }
 
-
-
-  render() {
- 
-    return (
-   <KeyboardAvoidingView style={styles.container} behavior="padding">
-        <Text>Rota Compartilhada</Text>
-
-        <TextInput
-          onChangeText={value => this.onChangeText('originText', value+'|')}
-          style={styles.input}
-          placeholder="Origem"
-        />
-
-       <TextInput
-          onChangeText={value => this.onChangeText('waypointsText', value)}
-          style={styles.input}
-          placeholder="Pontos de Parada"
-        />
-      
-      <Button title="Criar Rota" onPress={this.saveButton.bind(this)} />    
-      </KeyboardAvoidingView>
-    );
-  }  
+    render(){
+      if (this.state.refreshing) {
+        return (
+          //loading view while data is loading
+          <View style={{ flex: 1, paddingTop: 20 }}>
+            <ActivityIndicator />
+          </View>
+        );
+      }
+    
+        return(
+          <KeyboardAvoidingView style={styles1.container} behavior="padding" enabled>
+         <Button 
+         title="Criar Rota Compartilhada" 
+         onPress={this.saveRoute.bind(this)} />    
+          <Text></Text>
+    
+          <Button 
+          title="Adicionar Endereço"
+           onPress={this.saveButton.bind(this)} 
+           />
+           <Text></Text>
+    
+          <FlatList
+            style={{ marginTop: 15 }}
+            contentContainerStyle={styles1.list}
+            data={this.state.listRoutes}
+            renderItem = {({item}) =>
+            <View style={styles1.listItem}>
+              <Text style={styles1.format}>{item}</Text>
+              <TouchableOpacity onPress ={() => this.RemoveRoute(item)} >
+              <View>
+              <Image
+                  source={require("../../images/cross.jpg")}
+                  style={styles1.float}
+    
+                />
+              </View>
+              </TouchableOpacity>
+          </View>
+          }
+            keyExtractor={(item, index) => index.toString()}
+            refreshControl={
+              <RefreshControl
+                 refreshing={this.state.refreshing}
+                onRefresh={this.onRefresh.bind(this)}
+              />
+            }
+          />
+    
+    <DialogInput isDialogVisible={this.state.isDialogVisible}
+                title={"Adicionar Endereço"}
+                message={"Digite o Endereço"}
+                hintInput ={"Digite o Endereço"}
+                submitInput={ (inputText) => {this.addRoute(inputText)} }
+                closeDialog={ () => { this.setState({isDialogVisible:false})}}>
+              </DialogInput>
+    
+    </KeyboardAvoidingView>
+        )
+      } 
 }
 
 
@@ -312,6 +402,47 @@ class ConclusionScreen extends React.Component {
 }
 }
 
+
+const styles1 = StyleSheet.create({
+  container: {
+    margin: 30,
+    flex: 5,
+    backgroundColor: '#fff',
+    padding: 16,
+
+  },
+  textInput: {
+      margin: 15,
+      height: 30,
+      width: 200,
+      borderWidth: 1,
+      fontSize: 20,
+   },  list: {
+    paddingHorizontal: 20,
+  },  
+  listItem: {
+    backgroundColor: '#f0f8ff',
+    marginTop: 5,
+    padding: 30,
+  },
+  format:{
+    fontSize: 15,
+  },
+  float:{
+    marginTop:-20,
+    alignSelf: 'flex-end',
+    height: 25, 
+    width: 25
+
+  },
+  input: {
+    height: 50,
+    borderBottomWidth: 2,
+    borderBottomColor: '#2196F3',
+    margin: 10,
+  }
+   
+});
 
 const styles = StyleSheet.create({
 container: {
