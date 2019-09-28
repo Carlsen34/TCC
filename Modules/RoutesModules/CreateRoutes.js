@@ -261,7 +261,8 @@ class ConclusionScreen extends React.Component {
     apiResponse:"",
     hasRoute:false,
     RouteName:"",
-    routeAux:[]
+    routeAux:[],
+    refreshing:false
 
   };
 
@@ -309,7 +310,7 @@ class ConclusionScreen extends React.Component {
 
   handleButton = async (vehicles,index_vehicles,dist,max_dist,route) => {
 
-
+     await this.setState({refreshing:true})
 
       var i;
       for (i = 0; i < index_vehicles.length; i++) {
@@ -354,10 +355,11 @@ class ConclusionScreen extends React.Component {
 
       await this.saveRoutes("getRoute","/getRoute",objRoutesAux);
       await this.getRoutes(user)
-      alert('Rota Compartilhada com Sucesso');
+      await this.setState({refreshing:false})
     }
       }
 
+      alert('Rota Compartilhada com Sucesso');
 
    }
 
@@ -371,7 +373,14 @@ class ConclusionScreen extends React.Component {
   var max_dist = navigation.getParam('max_dist', '');
   var route = navigation.getParam('route', '');
 
-
+  if (this.state.refreshing) {
+    return (
+      //loading view while data is loading
+      <View style={{ flex: 1, paddingTop: 20,marginTop:100}}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
 
 
   return(

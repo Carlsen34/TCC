@@ -35,7 +35,7 @@ export default class ListUsers extends React.Component {
     hasFriend:false,
     refreshing:true,
     isDialogVisible:false
-  };
+    };
 
   handleChangeUser = (event) => {
     this.setState({NewFriend: event});
@@ -56,7 +56,6 @@ async auxFriend(friend){
   await this.newFriend(friend,user)
   await this.getUser(user);
   this.setState({animating:false})
-  alert('Contato Adicionado com Sucesso');
   this.setState({isDialogVisible:false})
 }
 
@@ -186,6 +185,7 @@ async  deleteUser(user,newFriends) {
             console.log(objNewFriend)
             console.log("response from saving note: " + apiResponse);
             this.setState({apiResponse});
+
             return apiResponse;
           } catch (e) {
             console.log(e);
