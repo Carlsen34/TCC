@@ -101,11 +101,13 @@ export default class App extends React.Component {
     }
 
  async startSharePosition(){
+      alert("Compartilhamento de Rota Iniciada")
       this.sharePosition()
-      this.interval = setInterval(() => this.sharePosition(), 8000);
+      this.interval = setInterval(() => this.sharePosition(), 2000);
     }
 
  async cancelSharePosition(){
+  alert("Compartilhamento de Rota Cancelada")
   clearInterval(this.interval);
   this.cancelSharePositionAux()
     }
@@ -345,7 +347,7 @@ render(){
     <Text></Text>
 
     <Button 
-    title="Cancelamento de Localizacao"
+    title="Cancelar Compartilhamento"
      onPress={this.cancelSharePosition.bind(this)} /> 
 
 

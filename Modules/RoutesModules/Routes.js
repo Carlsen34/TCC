@@ -14,7 +14,7 @@ import { createAppContainer, createStackNavigator, StackActions, NavigationActio
 
 const GOOGLE_MAPS_APIKEY = AWSConfig.GOOGLEAPI;
 const routeAPI = 'http://vrp-dev.us-east-1.elasticbeanstalk.com/api/v1/vrp/route=';
-const arr = [];
+var arr = [];
 
 const backgroundColor = '#007256';
 
@@ -247,14 +247,12 @@ componentWillMount(){
     
       };
 
+      async componentWillUnmount(){
+        arr = []
+      }
+
       async componentDidMount() {
         let isGranted = await this.requestLocationPermission();
-
-        if (isGranted) {
-            this.getLocation();
-        }
-
-        this.getLocation();
 
         const { navigation } = this.props;
         const origin = navigation.getParam('origin', '');

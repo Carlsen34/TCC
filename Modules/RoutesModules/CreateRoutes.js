@@ -47,8 +47,17 @@ class AddressScreen extends React.Component {
     }
   
     async addRoute(addRoute){
+      var str1 = ""
+      if(addRoute.slice(-1) ==" "){
+        str1 = addRoute.replace(/.$/,"")
+      } 
+      else{
+        str1 = addRoute
+      } 
+       
+
       this.setState({animating:true})
-      await listRoutesAux.push(addRoute)
+      await listRoutesAux.push(str1)
       this.setState({
         listRoutes: listRoutesAux
       })
@@ -184,7 +193,7 @@ completeRoute = (fullAPI) => {
 }
 
 )
-.catch(error => alert(error))
+.catch(error => alert("Algum endereço está invalido"))
       }
 
 async auxgetUser(){
@@ -310,7 +319,7 @@ class ConclusionScreen extends React.Component {
 
   handleButton = async (vehicles,index_vehicles,dist,max_dist,route) => {
 
-     await this.setState({refreshing:true})
+      this.setState({refreshing:true})
 
       var i;
       for (i = 0; i < index_vehicles.length; i++) {
@@ -355,7 +364,7 @@ class ConclusionScreen extends React.Component {
 
       await this.saveRoutes("getRoute","/getRoute",objRoutesAux);
       await this.getRoutes(user)
-      await this.setState({refreshing:false})
+       this.setState({refreshing:false})
     }
       }
 

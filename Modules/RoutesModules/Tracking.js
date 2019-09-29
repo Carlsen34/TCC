@@ -169,7 +169,7 @@ class ShareScreen extends React.Component {
   }
 
 componentDidMount() {
-      this.interval = setInterval(() => this.getLocation(), 10000);
+      this.interval = setInterval(() => this.getLocation(), 2000);
     }
   
 

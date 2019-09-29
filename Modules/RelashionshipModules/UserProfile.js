@@ -135,8 +135,8 @@ export default class UserProfile extends React.Component {
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
-        <Text>Share Route Screen</Text>
-        <Text>name: {name}</Text>
+        <Text>Tela de Compartilhamento de Rotas</Text>
+        <Text></Text>
      
             <FlatList
             style={{ marginTop: 30 }}
