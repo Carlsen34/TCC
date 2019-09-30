@@ -255,7 +255,7 @@ export default class App extends React.Component {
   }
 
   handleGetGoogleMapDirections = async () => {
-    await this.sharePosition()
+    //await this.sharePosition()
     var data = await {
 
         source: await this.state.origin,

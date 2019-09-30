@@ -3,8 +3,8 @@ import { Platform } from 'react-native';
 import { createAppContainer, createBottomTabNavigator } from 'react-navigation';
 
 
-import Compartilhada from './CreateRoutes';
-import Propria from './Routes';
+import Compartilhada from './CreateMultipleRoutes';
+import Propria from './CreateRoutes';
 
 
 
