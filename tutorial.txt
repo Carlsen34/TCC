@@ -1,0 +1,14 @@
+- Instalar o aplicativo Expo (Expo Project) em um celular Android (Google Play)
+- Instalar Expo CLI (Command Line Interface) em um computador (Preferencialmente no ambiente Linux) 
+			- npm install -g expo-cli (https://docs.expo.io/versions/latest/get-started/installation/)
+- Descompactar o arquivo .ZIP
+- Dentro do diretorio TCC-master executar os comandos
+			- sudo npm install
+			- sudo expo start --android
+- Aguardar até aparecer um QR-CODE no terminal
+- Acessar o aplicativo Expo no celular e scanear o QR-CODE
+- Aguarde até o projeto ser inicializado no celular
+
+
+Diretorio GitHub
+https://github.com/Carlsen34/TCC
